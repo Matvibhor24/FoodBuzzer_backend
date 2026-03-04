@@ -1,32 +1,30 @@
 package com.example.food_buzzer_backend.controller;
 
+
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
-import com.example.food_buzzer_backend.model.User;
-import com.example.food_buzzer_backend.service.UserService;
+
+import com.example.food_buzzer_backend.dto.request.LoginRequest;
+import com.example.food_buzzer_backend.dto.request.RegisterOwnerRequest;
+import com.example.food_buzzer_backend.dto.response.LoginResponse;
+import com.example.food_buzzer_backend.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userService.register(user);
+    public AuthController(AuthService authService){
+        this.authService = authService;
     }
 
     @PostMapping("/login")
-public String login(@RequestBody User loginRequest) {
+    public LoginResponse login(@RequestBody LoginRequest request){
+        return authService.login(request);
+    }
 
-    return userService.login(
-            loginRequest.getEmail(),
-            loginRequest.getPassword()
-    );
-}
+    @PostMapping("/register-owner")
+    public String registerOwner(@RequestBody RegisterOwnerRequest request){
+        return authService.registerOwner(request);
+    }
 }
