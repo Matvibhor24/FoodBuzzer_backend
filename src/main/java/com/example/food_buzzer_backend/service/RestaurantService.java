@@ -55,6 +55,6 @@ public class RestaurantService {
 
         restaurantRepository.save(restaurant);
 
-        return new CreateRestaurantResponse(restaurant.getId(), "Restaurant submitted for approval");
+        return new CreateRestaurantResponse(restaurant.getId(), AppConstants.MSG_RESTAURANT_SUBMITTED_FOR_APPROVAL);
     }
 }

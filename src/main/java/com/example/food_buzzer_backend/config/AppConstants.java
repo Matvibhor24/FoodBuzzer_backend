@@ -25,6 +25,14 @@ public final class AppConstants {
     public static final boolean DEFAULT_RESTAURANT_LIVE = false;
     public static final String EMPTY_STRING = "";
 
+
+    public static final String MSG_INVALID_CREDENTIALS = "Invalid credentials";
+    public static final String MSG_USER_INACTIVE = "User inactive";
+    public static final String MSG_LOGIN_SUCCESSFUL = "Login successful";
+    public static final String MSG_EMAIL_ALREADY_REGISTERED = "Email already registered";
+    public static final String MSG_OWNER_REGISTERED_SUCCESSFUL = "Owner registered successful";
+    public static final String MSG_RESTAURANT_SUBMITTED_FOR_APPROVAL = "Restaurant submitted for approval";
+
     public static final String ERROR_USER_NOT_FOUND = "User not found";
     public static final String ERROR_USER_NOT_OWNER = "User is not an owner";
     public static final String ERROR_INSUFFICIENT_ACCESS = "Insufficient access level";

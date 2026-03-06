@@ -19,7 +19,7 @@ public class RestaurantController {
 
     @PostMapping
     public CreateRestaurantResponse createRestaurant(
-            @RequestHeader(name = "X-User-Id" , required = true) Long userId,
+            @RequestHeader(name = "X-User-Id", required = true) Long userId,
             @RequestBody CreateRestaurantRequest request){
         return restaurantService.createRestaurant(request, userId);
     }
