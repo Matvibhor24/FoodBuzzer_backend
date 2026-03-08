@@ -2,7 +2,6 @@ package com.example.food_buzzer_backend.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.example.food_buzzer_backend.config.AppConstants;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantRequest;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantResponse;
 import com.example.food_buzzer_backend.service.RestaurantService;
