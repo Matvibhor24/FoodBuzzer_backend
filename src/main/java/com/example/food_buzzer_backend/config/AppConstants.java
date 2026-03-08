@@ -23,8 +23,24 @@ public final class AppConstants {
 
     public static final boolean DEFAULT_USER_ACTIVE = true;
     public static final boolean DEFAULT_RESTAURANT_LIVE = false;
+    public static final boolean DEFAULT_INVENTORY_ACTIVE = true;
     public static final String EMPTY_STRING = "";
 
+    // Inventory Material Categories
+    public static final String CATEGORY_VEGETABLE = "VEGETABLE";
+    public static final String CATEGORY_MEAT = "MEAT";
+    public static final String CATEGORY_DAIRY = "DAIRY";
+    public static final String CATEGORY_SPICES = "SPICES";
+    public static final String CATEGORY_OIL = "OIL";
+    public static final String CATEGORY_OTHER = "OTHER";
+
+    // Inventory Units
+    public static final String UNIT_KG = "kg";
+    public static final String UNIT_GRAM = "g";
+    public static final String UNIT_LITER = "liter";
+    public static final String UNIT_ML = "ml";
+    public static final String UNIT_PIECE = "piece";
+    public static final String UNIT_DOZEN = "dozen";
 
     public static final String MSG_INVALID_CREDENTIALS = "Invalid credentials";
     public static final String MSG_USER_INACTIVE = "User inactive";

@@ -67,4 +67,8 @@ public class User {
     public Integer getAccessLevel(){ return accessLevel; }
 
     public void setAccessLevel(Integer accessLevel){ this.accessLevel = accessLevel; }
+
+    public LocalDateTime getCreatedAt(){ return createdAt; }
+
+    public void setCreatedAt(LocalDateTime createdAt){ this.createdAt = createdAt; }
 }
