@@ -31,12 +31,16 @@ public class RestaurantService {
             return new CreateRestaurantResponse(null, AppConstants.ERROR_USER_NOT_FOUND);
         }
 
-        if (!AppConstants.ROLE_OWNER.equalsIgnoreCase(owner.getRole())) {
+        if (owner.getRole() == null || !AppConstants.ROLE_OWNER.equalsIgnoreCase(owner.getRole())) {
             return new CreateRestaurantResponse(null, AppConstants.ERROR_USER_NOT_OWNER);
         }
 
         if (owner.getAccessLevel() == null || owner.getAccessLevel() < AppConstants.ACCESS_LEVEL_OWNER) {
             return new CreateRestaurantResponse(null, AppConstants.ERROR_INSUFFICIENT_ACCESS);
+        }
+
+        if (restaurantRepository.existsBySlug(request.getSlug())) {
+            return new CreateRestaurantResponse(null, "Slug '" + request.getSlug() + "' is already taken, please choose another.");
         }
 
         Restaurant restaurant = new Restaurant();

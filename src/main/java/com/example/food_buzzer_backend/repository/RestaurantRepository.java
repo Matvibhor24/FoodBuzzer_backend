@@ -11,4 +11,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     List<Restaurant> findByOwner_Id(Long ownerUserId);
 
     long countByApprovalStatus(String approvalStatus);
+
+    boolean existsBySlug(String slug);
 }
