@@ -1,137 +1,147 @@
 package com.example.food_buzzer_backend.service;
 
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.food_buzzer_backend.config.AppConstants;
 import com.example.food_buzzer_backend.dto.admin.AdminApprovalRequest;
 import com.example.food_buzzer_backend.dto.admin.AdminApprovalResponse;
 import com.example.food_buzzer_backend.dto.admin.AdminDashboardResponse;
 import com.example.food_buzzer_backend.dto.admin.AdminRestaurantByUserResponse;
 import com.example.food_buzzer_backend.dto.admin.RestaurantDetailsResponse;
+import com.example.food_buzzer_backend.exception.ResourceNotFoundException;
 import com.example.food_buzzer_backend.model.Restaurant;
 import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.RestaurantRepository;
+import com.example.food_buzzer_backend.repository.UserRepository;
 
 @Service
 public class AdminService {
 
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
 
-    public AdminService(RestaurantRepository restaurantRepository) {
+    public AdminService(RestaurantRepository restaurantRepository, UserRepository userRepository) {
         this.restaurantRepository = restaurantRepository;
+        this.userRepository = userRepository;
     }
 
-    // Converts entity -> response DTO
-    private RestaurantDetailsResponse toDetails(Restaurant r) {
-        User owner = r.getOwner();
+    private RestaurantDetailsResponse toDetails(Restaurant restaurant) {
+        User owner = restaurant.getOwner();
         Long ownerId = owner != null ? owner.getId() : null;
         String ownerName = owner != null ? owner.getFullName() : null;
         String ownerEmail = owner != null ? owner.getEmail() : null;
 
         return new RestaurantDetailsResponse(
-                r.getId(),
-                r.getName(),
-                r.getSlug(),
-                r.getAddress(),
-                r.getGST(),
-                r.getZipcode(),
-                r.getPhone(),
-                r.getApprovalStatus(),
-                r.getApprovalNote(),
+                restaurant.getId(),
+                restaurant.getName(),
+                restaurant.getSlug(),
+                restaurant.getAddress(),
+                restaurant.getGST(),
+                restaurant.getZipcode(),
+                restaurant.getPhone(),
+                restaurant.getApprovalStatus(),
+                restaurant.getApprovalNote(),
                 ownerId,
                 ownerName,
                 ownerEmail
         );
     }
 
-    public AdminDashboardResponse getRequestsByStatus(String status) {
-        // Fetch restaurants grouped by status
+    private void validateAdminAccess(Long adminUserId) {
+        User adminUser = userRepository.findById(adminUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (adminUser.getAccessLevel() == null
+                || adminUser.getAccessLevel() != AppConstants.ACCESS_LEVEL_ADMIN) {
+            throw new SecurityException("Access denied. Admin access required");
+        }
+    }
+
+    public AdminDashboardResponse getRequestsByStatus(Long adminUserId, String status) {
+        validateAdminAccess(adminUserId);
+
         List<Restaurant> restaurants;
+        String normalizedStatus;
+
         if (status == null || status.equalsIgnoreCase("all")) {
             restaurants = restaurantRepository.findAll();
-            status = "all";
+            normalizedStatus = "all";
         } else {
-            restaurants = restaurantRepository.findByApprovalStatus(status.toLowerCase());
+            normalizedStatus = status.toLowerCase();
+            restaurants = restaurantRepository.findByApprovalStatus(normalizedStatus);
         }
 
         List<RestaurantDetailsResponse> responses = new ArrayList<>();
-
-        for (Restaurant r : restaurants) {
-            responses.add(toDetails(r));
+        for (Restaurant restaurant : restaurants) {
+            responses.add(toDetails(restaurant));
         }
 
-        long pendingCount = restaurantRepository.countByApprovalStatus("pending");
-        long approvedCount = restaurantRepository.countByApprovalStatus("approved");
-        long declinedCount = restaurantRepository.countByApprovalStatus("declined");
+        long pendingCount = restaurantRepository.countByApprovalStatus(AppConstants.APPROVAL_STATUS_PENDING);
+        long approvedCount = restaurantRepository.countByApprovalStatus(AppConstants.APPROVAL_STATUS_APPROVED);
+        long declinedCount = restaurantRepository.countByApprovalStatus(AppConstants.APPROVAL_STATUS_DECLINED);
 
         return new AdminDashboardResponse(
-                status.toUpperCase(),
+                normalizedStatus.toUpperCase(),
                 responses,
                 responses.size(),
                 pendingCount,
                 approvedCount,
-                declinedCount,
-                "Requests fetched"
+                declinedCount
         );
     }
 
-    public AdminRestaurantByUserResponse getRestaurantByOwnerUserId(Long ownerUserId) {
+    public AdminRestaurantByUserResponse getRestaurantByOwnerUserId(Long adminUserId, Long ownerUserId) {
+        validateAdminAccess(adminUserId);
+
         if (ownerUserId == null) {
-            return new AdminRestaurantByUserResponse(null, "ownerUserId is required", 422);
+            throw new IllegalArgumentException("ownerUserId is required");
         }
 
         List<Restaurant> restaurants = restaurantRepository.findByOwner_Id(ownerUserId);
         if (restaurants.isEmpty()) {
-            return new AdminRestaurantByUserResponse(null, "No restauarants found for user", 404);
+            throw new ResourceNotFoundException("No restaurants found for user");
         }
 
         List<RestaurantDetailsResponse> responses = new ArrayList<>();
-
-        for (Restaurant r : restaurants) {
-            responses.add(toDetails(r));
+        for (Restaurant restaurant : restaurants) {
+            responses.add(toDetails(restaurant));
         }
 
-        return new AdminRestaurantByUserResponse(responses, "Restaurants fetched", 200);
+        return new AdminRestaurantByUserResponse(responses);
     }
 
     public AdminApprovalResponse updateApproval(Long adminUserId, AdminApprovalRequest request) {
-        // adminUserId comes from header. Currently no auth, so just validate presence.
-        if (adminUserId == null) {
-            return new AdminApprovalResponse("Missing admin user id in header (X-User-Id)", 422);
-        }
+        validateAdminAccess(adminUserId);
+
         if (request == null) {
-            return new AdminApprovalResponse("Request body is required", 422);
+            throw new IllegalArgumentException("Request body is required");
         }
         if (request.getRestaurantId() == null) {
-            return new AdminApprovalResponse("ownerUserId is required", 422);
+            throw new IllegalArgumentException("restaurantId is required");
         }
         if (request.getIsApproved() == null) {
-            return new AdminApprovalResponse("isApproved is required", 422);
+            throw new IllegalArgumentException("isApproved is required");
         }
 
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(request.getRestaurantId());
-        if (restaurantOpt.isEmpty()) {
-            return new AdminApprovalResponse("Restaurant not found for given owner user id", 404);
-        }
+        Restaurant restaurant = restaurantRepository.findById(request.getRestaurantId())
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
 
-        Restaurant restaurant = restaurantOpt.get();
-
-        // Set status based on boolean
         if (Boolean.TRUE.equals(request.getIsApproved())) {
-            restaurant.setApprovalStatus("APPROVED");
+            restaurant.setApprovalStatus(AppConstants.APPROVAL_STATUS_APPROVED);
         } else {
-            restaurant.setApprovalStatus("DECLINED");
+            restaurant.setApprovalStatus(AppConstants.APPROVAL_STATUS_DECLINED);
         }
 
-        // Save notes if provided
         restaurant.setApprovalNote(request.getApprovalNotes());
-
         restaurantRepository.save(restaurant);
 
-        return new AdminApprovalResponse("Approval updated", 200);
+        return new AdminApprovalResponse(
+                restaurant.getId(),
+                restaurant.getApprovalStatus(),
+                restaurant.getApprovalNote()
+        );
     }
 }
