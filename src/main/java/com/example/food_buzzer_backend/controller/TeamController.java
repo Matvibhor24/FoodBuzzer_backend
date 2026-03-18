@@ -1,6 +1,5 @@
 package com.example.food_buzzer_backend.controller;
 
-import com.example.food_buzzer_backend.model.User;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import com.example.food_buzzer_backend.service.TeamService;

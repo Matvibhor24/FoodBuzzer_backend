@@ -43,6 +43,10 @@ public class RestaurantService {
         //     return new CreateRestaurantResponse(null, "Slug '" + request.getSlug() + "' is already taken, please choose another.");
         // }
 
+        if (restaurantRepository.existsByNameAndZipcode(request.getName(), request.getZipcode())) {
+            return new CreateRestaurantResponse(null, "A restaurant with this name and zipcode already exists");
+        }
+
         Restaurant restaurant = new Restaurant();
 
         restaurant.setName(request.getName());

@@ -17,6 +17,8 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     boolean existsBySlug(String slug);
 
+    boolean existsByNameAndZipcode(String name, String zipcode);
+
     Optional<Restaurant> findByIdAndIsLiveTrue(Long id);
     
     boolean existsByIdAndIsLiveTrue(Long id);
