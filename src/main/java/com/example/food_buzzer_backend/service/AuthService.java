@@ -38,7 +38,7 @@ public class AuthService {
             return new LoginResponse(null, null, null, AppConstants.MSG_USER_INACTIVE);
         }
 
-        if(user.getRestaurant() == null){
+        if(!AppConstants.ROLE_ADMIN.equals(user.getRole()) && user.getRestaurant() == null){
             return new LoginResponse(user.getId(), user.getRole(), user.getAccessLevel(), AppConstants.MSG_USER_NOT_ASSIGNED_TO_RESTAURANT);
         }
 

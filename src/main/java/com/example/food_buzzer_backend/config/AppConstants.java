@@ -10,20 +10,23 @@ public final class AppConstants {
     public static final String ROLE_MANAGER = "manager";
     public static final String ROLE_ADMIN = "admin";
 
-    public static final int ACCESS_LEVEL_DEFAULT = 0;
-    public static final int ACCESS_LEVEL_STAFF = 0;
-    public static final int ACCESS_LEVEL_CASHIER = 1;
-    public static final int ACCESS_LEVEL_MANAGER = 2;
-    public static final int ACCESS_LEVEL_OWNER = 3;
-    public static final int ACCESS_LEVEL_ADMIN = 4;
+    public static final Integer ACCESS_LEVEL_DEFAULT = 0;
+    public static final Integer ACCESS_LEVEL_STAFF = 0;
+    public static final Integer ACCESS_LEVEL_CASHIER = 1;
+    public static final Integer ACCESS_LEVEL_MANAGER = 2;
+    public static final Integer ACCESS_LEVEL_OWNER = 3;
+    public static final Integer ACCESS_LEVEL_ADMIN = 4;
 
     public static final String APPROVAL_STATUS_PENDING = "pending";
     public static final String APPROVAL_STATUS_APPROVED = "approved";
     public static final String APPROVAL_STATUS_DECLINED = "declined";
 
     public static final boolean DEFAULT_USER_ACTIVE = true;
+    public static final boolean DEFAULT_RESTAURANT_ACTIVE = false;
     public static final boolean DEFAULT_RESTAURANT_LIVE = false;
     public static final boolean DEFAULT_INVENTORY_ACTIVE = true;
+    public static final boolean FALSE_VALUE = false;
+    public static final boolean TRUE_VALUE = true;
     public static final String EMPTY_STRING = "";
 
     // Inventory Material Categories
@@ -41,6 +44,14 @@ public final class AppConstants {
     public static final String UNIT_ML = "ml";
     public static final String UNIT_PIECE = "piece";
     public static final String UNIT_DOZEN = "dozen";
+
+    // Order Statuses
+    public static final String ORDER_STATUS_PENDING = "PENDING";
+    public static final String ORDER_STATUS_ACCEPTED = "ACCEPTED";
+    public static final String ORDER_STATUS_COOKING = "COOKING";
+    public static final String ORDER_STATUS_PREPARED = "PREPARED";
+    public static final String ORDER_STATUS_COMPLETED = "COMPLETED";
+    public static final String ORDER_STATUS_FAILED = "FAILED";
 
     public static final String MSG_INVALID_CREDENTIALS = "Invalid credentials";
     public static final String MSG_USER_INACTIVE = "User inactive";

@@ -30,6 +30,8 @@ public class Restaurant {
 
     private boolean isLive = AppConstants.DEFAULT_RESTAURANT_LIVE;
 
+    private boolean isActive = AppConstants.DEFAULT_RESTAURANT_ACTIVE;
+
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -89,6 +91,10 @@ public class Restaurant {
     public boolean getIsLive(){ return isLive; }
 
     public void setIsLive(boolean isLive){ this.isLive = isLive; }
+
+    public boolean getIsActive(){ return isActive; }
+
+    public void setIsActive(boolean isActive){ this.isActive = isActive; }
 
     public LocalDateTime getCreatedAt(){ return createdAt; }
 

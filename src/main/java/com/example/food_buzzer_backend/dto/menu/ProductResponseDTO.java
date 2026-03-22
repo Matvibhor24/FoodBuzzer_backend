@@ -12,6 +12,7 @@ public class ProductResponseDTO {
     private String category;
     private BigDecimal price;
     private Boolean isLive;
+    private Boolean isBestSeller;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -64,6 +65,14 @@ public class ProductResponseDTO {
 
     public void setIsLive(Boolean isLive) {
         this.isLive = isLive;
+    }
+
+    public Boolean getIsBestSeller() {
+        return isBestSeller;
+    }
+
+    public void setIsBestSeller(Boolean isBestSeller) {
+        this.isBestSeller = isBestSeller;
     }
 
     public LocalDateTime getCreatedAt() {

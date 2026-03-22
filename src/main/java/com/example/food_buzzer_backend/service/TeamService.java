@@ -28,26 +28,32 @@ public class TeamService {
             return response;
         }
 
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            response.setMessage("Already Present");
-            return response;
+        User user = userRepository.findByEmail(dto.getEmail()).orElse(null);
+
+        if (user != null) {
+            // If user is active and already belongs to a restaurant, don't allow reassignment
+            if (Boolean.TRUE.equals(user.getIsActive()) && user.getRestaurant() != null) {
+                response.setMessage("Email already registered and active in a team");
+                return response;
+            }
+        } else {
+            // Create a completely new user
+            user = new User();
+            user.setEmail(dto.getEmail());
         }
 
-        User user = new User();
         user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
         user.setPhone(dto.getPhone());
         user.setRestaurant(owner.getRestaurant());
         user.setRole(dto.getRole());
+        user.setIsActive(AppConstants.DEFAULT_USER_ACTIVE);
 
-        if (AppConstants.ROLE_STAFF.equals(dto.getRole()))
+        if (AppConstants.ROLE_STAFF.equalsIgnoreCase(dto.getRole()))
             user.setAccessLevel(AppConstants.ACCESS_LEVEL_STAFF);
-
-        else if (AppConstants.ROLE_CASHIER.equals(dto.getRole()))
+        else if (AppConstants.ROLE_CASHIER.equalsIgnoreCase(dto.getRole()))
             user.setAccessLevel(AppConstants.ACCESS_LEVEL_CASHIER);
-
-        else if (AppConstants.ROLE_MANAGER.equals(dto.getRole()))
+        else if (AppConstants.ROLE_MANAGER.equalsIgnoreCase(dto.getRole()))
             user.setAccessLevel(AppConstants.ACCESS_LEVEL_MANAGER);
 
         userRepository.save(user);
@@ -60,14 +66,26 @@ public class TeamService {
         return response;
     }
 
-    public List<User> getTeamMembers(Long ownerId) {
+    public List<TeamMemberResponseDTO> getTeamMembers(Long ownerId) {
 
         User owner = userRepository.findById(ownerId).orElse(null);
 
         if (owner == null || owner.getRestaurant() == null)
             return List.of();
 
-        return userRepository.findByRestaurantId(owner.getRestaurant().getId());
+        List<User> users = userRepository.findByRestaurantId(owner.getRestaurant().getId());
+        return users.stream().map(user -> {
+            TeamMemberResponseDTO dto = new TeamMemberResponseDTO();
+            dto.setId(user.getId());
+            dto.setFullName(user.getFullName());
+            dto.setEmail(user.getEmail());
+            dto.setPhone(user.getPhone());
+            dto.setRole(user.getRole());
+            dto.setAccessLevel(user.getAccessLevel());
+            dto.setIsActive(user.getIsActive());
+            dto.setCreatedAt(user.getCreatedAt());
+            return dto;
+        }).toList();
     }
 
     public TeamCreationResponse deleteMember(Long ownerId, TeamDeleteDTO dto) {
@@ -76,7 +94,7 @@ public class TeamService {
 
         User owner = userRepository.findById(ownerId).orElse(null);
 
-        if (owner == null || !AppConstants.ROLE_OWNER.equals(owner.getRole())) {
+        if (owner == null || !AppConstants.ROLE_OWNER.equals(owner.getRole()) || owner.getRestaurant() == null) {
             response.setMessage(AppConstants.ERROR_USER_NOT_OWNER);
             return response;
         }
@@ -87,11 +105,20 @@ public class TeamService {
             response.setMessage("User Invalid");
             return response;
         }
+        
+        if (user.getRestaurant() == null || !user.getRestaurant().getId().equals(owner.getRestaurant().getId())) {
+             response.setMessage("User does not belong to your restaurant");
+             return response;
+        }
+        
+        if (user.getId().equals(ownerId)) {
+             response.setMessage("Cannot delete yourself");
+             return response;
+        }
 
         user.setRestaurant(null);
-	user.setAccessLevel(null);
+        user.setAccessLevel(null);
         user.setIsActive(false);
- 	user.setRestaurant(null);
 
         userRepository.save(user);
 
@@ -109,7 +136,7 @@ public class TeamService {
 
         User owner = userRepository.findById(ownerId).orElse(null);
 
-        if (owner == null || !AppConstants.ROLE_OWNER.equals(owner.getRole())) {
+        if (owner == null || !AppConstants.ROLE_OWNER.equals(owner.getRole()) || owner.getRestaurant() == null) {
             response.setMessage(AppConstants.ERROR_USER_NOT_OWNER);
             return response;
         }
@@ -120,8 +147,33 @@ public class TeamService {
             response.setMessage("User Invalid");
             return response;
         }
+        
+        if (user.getRestaurant() == null || !user.getRestaurant().getId().equals(owner.getRestaurant().getId())) {
+            response.setMessage("User does not belong to your restaurant");
+            return response;
+        }
+        
+        if (user.getId().equals(ownerId)) {
+            response.setMessage("Cannot modify your own role");
+            return response;
+        }
 
-        user.setRole(dto.getNewRole());
+        String newRole = dto.getNewRole();
+        if (!AppConstants.ROLE_STAFF.equals(newRole) && 
+            !AppConstants.ROLE_CASHIER.equals(newRole) && 
+            !AppConstants.ROLE_MANAGER.equals(newRole)) {
+            response.setMessage("Invalid role specified");
+            return response;
+        }
+
+        user.setRole(newRole);
+        
+        if (AppConstants.ROLE_STAFF.equals(newRole))
+            user.setAccessLevel(AppConstants.ACCESS_LEVEL_STAFF);
+        else if (AppConstants.ROLE_CASHIER.equals(newRole))
+            user.setAccessLevel(AppConstants.ACCESS_LEVEL_CASHIER);
+        else if (AppConstants.ROLE_MANAGER.equals(newRole))
+            user.setAccessLevel(AppConstants.ACCESS_LEVEL_MANAGER);
 
         userRepository.save(user);
 

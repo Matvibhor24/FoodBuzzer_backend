@@ -1,4 +1,4 @@
-package com.example.food_buzzer_backend.controller.menu;
+package com.example.food_buzzer_backend.controller;
 
 import com.example.food_buzzer_backend.dto.ApiResponse;
 import com.example.food_buzzer_backend.dto.menu.ProductRequestDTO;
@@ -20,28 +20,34 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ApiResponse> createProduct(
-            @RequestHeader(name = "X-Restaurant-Id", required = true) Long restaurantId,
             @RequestHeader(name = "X-User-Id", required = true) Long userId,
             @RequestBody ProductRequestDTO requestDTO) {
-        ProductResponseDTO responseDTO = productService.createProduct(restaurantId, userId, requestDTO);
+        ProductResponseDTO responseDTO = productService.createProduct(userId, requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Product created successfully", responseDTO));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts(
-            @RequestHeader(name = "X-Restaurant-Id", required = true) Long restaurantId,
             @RequestHeader(name = "X-User-Id", required = true) Long userId) {
-        List<ProductResponseDTO> products = productService.getAllProducts(restaurantId, userId);
+        List<ProductResponseDTO> products = productService.getAllProducts(userId);
         return ResponseEntity.ok(ApiResponse.success("Products retrieved successfully", products));
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse> getProductById(
-            @RequestHeader(name = "X-Restaurant-Id", required = true) Long restaurantId,
             @RequestHeader(name = "X-User-Id", required = true) Long userId,
             @PathVariable Long productId) {
-        ProductResponseDTO product = productService.getProductById(restaurantId, userId, productId);
+        ProductResponseDTO product = productService.getProductById(userId, productId);
         return ResponseEntity.ok(ApiResponse.success("Product retrieved successfully", product));
+    }
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<ApiResponse> updateProduct(
+            @RequestHeader(name = "X-User-Id", required = true) Long userId,
+            @PathVariable Long productId,
+            @RequestBody ProductRequestDTO requestDTO) {
+        ProductResponseDTO responseDTO = productService.updateProduct(userId, productId, requestDTO);
+        return ResponseEntity.ok(ApiResponse.success("Product updated successfully", responseDTO));
     }
 }

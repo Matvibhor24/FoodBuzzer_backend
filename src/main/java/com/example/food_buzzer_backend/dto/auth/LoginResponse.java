@@ -19,7 +19,7 @@ public class LoginResponse {
 
     public String getRole(){ return role; }
 
-    public int getAccessLevel(){return accessLevel;}
+    public Integer getAccessLevel(){return accessLevel;}
 
     public String getMessage(){ return message; }
 

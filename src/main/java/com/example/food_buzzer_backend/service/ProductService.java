@@ -40,22 +40,23 @@ public class ProductService {
     private UserRepository userRepository;
 
     @Transactional
-    public ProductResponseDTO createProduct(Long restaurantId, Long userId, ProductRequestDTO requestDTO) {
-        Restaurant restaurant = restaurantRepository.findByIdAndIsLiveTrue(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
-                
+    public ProductResponseDTO createProduct(Long userId, ProductRequestDTO requestDTO) {
         // Validate User and Access Level
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (!user.getIsActive()) {
             throw new IllegalArgumentException("User is not active");
         }
-        if (user.getRestaurant() == null || !user.getRestaurant().getId().equals(restaurantId)) {
-            throw new IllegalArgumentException("User does not belong to this restaurant");
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
         }
         if (user.getAccessLevel() < AppConstants.ACCESS_LEVEL_MANAGER) {
             throw new IllegalArgumentException("User does not have permission to create products");
         }
+        Long restaurantId = user.getRestaurant().getId();
+
+        Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
 
         if (productRepository.existsBySkuAndRestaurantId(requestDTO.getSku(), restaurantId)) {
             throw new IllegalArgumentException("Product with SKU '" + requestDTO.getSku() + "' already exists");
@@ -69,6 +70,7 @@ public class ProductService {
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
         product.setIsLive(requestDTO.getIsLive() != null ? requestDTO.getIsLive() : true);
+        product.setIsBestSeller(requestDTO.getIsBestSeller() != null ? requestDTO.getIsBestSeller() : false);
         Product savedProduct = productRepository.save(product);
 
         // 2. Create and save ProductRecipes (Assign recipes to product)
@@ -91,16 +93,20 @@ public class ProductService {
         return mapToResponseDTO(savedProduct, recipes);
     }
 
-    public List<ProductResponseDTO> getAllProducts(Long restaurantId, Long userId) {
-        if (!restaurantRepository.existsByIdAndIsLiveTrue(restaurantId)) {
-            throw new ResourceNotFoundException("Restaurant not found");
-        }
-        
+    public List<ProductResponseDTO> getAllProducts(Long userId) {
         // Validate User
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (user.getRestaurant() == null || !user.getRestaurant().getId().equals(restaurantId)) {
-            throw new IllegalArgumentException("User does not belong to this restaurant");
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
+        }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        Long restaurantId = user.getRestaurant().getId();
+
+        if (!restaurantRepository.existsByIdAndIsActiveTrue(restaurantId)) {
+            throw new ResourceNotFoundException("Restaurant not found");
         }
 
         List<Product> products = productRepository.findByRestaurantIdAndIsDeletedFalse(restaurantId);
@@ -111,19 +117,78 @@ public class ProductService {
         }).collect(Collectors.toList());
     }
 
-    public ProductResponseDTO getProductById(Long restaurantId, Long userId, Long productId) {
+    public ProductResponseDTO getProductById(Long userId, Long productId) {
         // Validate User
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (user.getRestaurant() == null || !user.getRestaurant().getId().equals(restaurantId)) {
-            throw new IllegalArgumentException("User does not belong to this restaurant");
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
         }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        Long restaurantId = user.getRestaurant().getId();
 
         Product product = productRepository.findByIdAndRestaurantIdAndIsDeletedFalse(productId, restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         List<ProductRecipe> recipes = productRecipeRepository.findByProductId(productId);
         return mapToResponseDTO(product, recipes);
+    }
+
+    @Transactional
+    public ProductResponseDTO updateProduct(Long userId, Long productId, ProductRequestDTO requestDTO) {
+        // Validate User and Access Level
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
+        }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        if (user.getAccessLevel() < AppConstants.ACCESS_LEVEL_MANAGER) {
+            throw new IllegalArgumentException("User does not have permission to update products");
+        }
+        Long restaurantId = user.getRestaurant().getId();
+
+        Product product = productRepository.findByIdAndRestaurantIdAndIsDeletedFalse(productId, restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        if (productRepository.existsBySkuAndRestaurantIdAndIdNot(requestDTO.getSku(), restaurantId, productId)) {
+            throw new IllegalArgumentException("Product with SKU '" + requestDTO.getSku() + "' already exists");
+        }
+
+        // 1. Update Product fields
+        product.setName(requestDTO.getName());
+        product.setSku(requestDTO.getSku());
+        product.setCategory(requestDTO.getCategory());
+        product.setPrice(requestDTO.getPrice());
+        product.setIsLive(requestDTO.getIsLive() != null ? requestDTO.getIsLive() : true);
+        product.setIsBestSeller(requestDTO.getIsBestSeller() != null ? requestDTO.getIsBestSeller() : false);
+        Product savedProduct = productRepository.save(product);
+
+        // 2. Delete existing ProductRecipes
+        productRecipeRepository.deleteByProductId(productId);
+
+        // 3. Create and save new ProductRecipes
+        List<ProductRecipe> recipes;
+        if (requestDTO.getRecipes() != null && !requestDTO.getRecipes().isEmpty()) {
+            recipes = requestDTO.getRecipes().stream().map(recipeDTO -> {
+                Recipe recipe = recipeRepository.findByIdAndRestaurantIdAndIsDeletedFalse(recipeDTO.getRecipeId(), restaurantId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Recipe not found for ID: " + recipeDTO.getRecipeId()));
+
+                ProductRecipe pr = new ProductRecipe();
+                pr.setProduct(savedProduct);
+                pr.setRecipe(recipe);
+                pr.setQuantity(recipeDTO.getQuantity());
+                return productRecipeRepository.save(pr);
+            }).collect(Collectors.toList());
+        } else {
+            recipes = List.of();
+        }
+
+        return mapToResponseDTO(savedProduct, recipes);
     }
 
     // Helper mapping method
@@ -135,6 +200,7 @@ public class ProductService {
         responseDTO.setCategory(product.getCategory());
         responseDTO.setPrice(product.getPrice());
         responseDTO.setIsLive(product.getIsLive());
+        responseDTO.setIsBestSeller(product.getIsBestSeller());
         responseDTO.setCreatedAt(product.getCreatedAt());
         responseDTO.setUpdatedAt(product.getUpdatedAt());
 
