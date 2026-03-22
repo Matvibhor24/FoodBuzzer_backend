@@ -17,24 +17,25 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
-        OrderResponse response = orderService.createOrder(request);
+    public ResponseEntity<OrderResponse> createOrder(@RequestHeader("userId") Long userId, @RequestBody OrderRequest request) {
+        OrderResponse response = orderService.createOrder(userId, request);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/restaurant/{restaurantId}")
+    @GetMapping("/restaurant/orders")
     public ResponseEntity<List<OrderResponse>> getOrdersByRestaurant(
-            @PathVariable Long restaurantId,
+            @RequestHeader("userId") Long userId,
             @RequestParam(required = false) List<String> statuses) {
-        List<OrderResponse> orders = orderService.getOrdersByRestaurant(restaurantId, statuses);
+        List<OrderResponse> orders = orderService.getOrdersByRestaurant(userId, statuses);
         return ResponseEntity.ok(orders);
     }
 
     @PutMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
+            @RequestHeader("userId") Long userId,
             @PathVariable Long orderId,
             @RequestParam String status) {
-        OrderResponse response = orderService.updateOrderStatus(orderId, status);
+        OrderResponse response = orderService.updateOrderStatus(userId, orderId, status);
         return ResponseEntity.ok(response);
     }
 }

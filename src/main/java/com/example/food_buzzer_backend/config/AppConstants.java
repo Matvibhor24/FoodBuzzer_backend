@@ -45,6 +45,14 @@ public final class AppConstants {
     public static final String UNIT_PIECE = "piece";
     public static final String UNIT_DOZEN = "dozen";
 
+    // Order Statuses
+    public static final String ORDER_STATUS_PENDING = "PENDING";
+    public static final String ORDER_STATUS_ACCEPTED = "ACCEPTED";
+    public static final String ORDER_STATUS_COOKING = "COOKING";
+    public static final String ORDER_STATUS_PREPARED = "PREPARED";
+    public static final String ORDER_STATUS_COMPLETED = "COMPLETED";
+    public static final String ORDER_STATUS_FAILED = "FAILED";
+
     public static final String MSG_INVALID_CREDENTIALS = "Invalid credentials";
     public static final String MSG_USER_INACTIVE = "User inactive";
     public static final String MSG_LOGIN_SUCCESSFUL = "Login successful";

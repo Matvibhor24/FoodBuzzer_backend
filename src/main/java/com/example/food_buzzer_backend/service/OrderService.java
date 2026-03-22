@@ -11,6 +11,10 @@ import com.example.food_buzzer_backend.repository.CartRepository;
 import com.example.food_buzzer_backend.repository.CustomerRepository;
 import com.example.food_buzzer_backend.repository.OrderRepository;
 import com.example.food_buzzer_backend.repository.RestaurantRepository;
+import com.example.food_buzzer_backend.repository.UserRepository;
+import com.example.food_buzzer_backend.config.AppConstants;
+import com.example.food_buzzer_backend.exception.ResourceNotFoundException;
+import com.example.food_buzzer_backend.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,11 +38,24 @@ public class OrderService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Transactional
-    public OrderResponse createOrder(OrderRequest request) {
-        Restaurant restaurant = restaurantRepository.findById(request.getRestaurantId())
+    public OrderResponse createOrder(Long userId, OrderRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
+        }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        Long restaurantId = user.getRestaurant().getId();
+
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
         // Find or create customer based on phone and restaurant
@@ -102,14 +119,24 @@ public class OrderService {
         order.setCartTotal(cartTotal);
         order.setDiscount(discount);
         order.setGrandTotal(grandTotal);
-        order.setStatus("PENDING"); // Initial status
+        order.setStatus(AppConstants.ORDER_STATUS_PENDING); // Initial status
         order.setTableId(request.getTableId());
         order = orderRepository.save(order);
 
         return new OrderResponse(order);
     }
 
-    public List<OrderResponse> getOrdersByRestaurant(Long restaurantId, List<String> statuses) {
+    public List<OrderResponse> getOrdersByRestaurant(Long userId, List<String> statuses) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
+        }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        Long restaurantId = user.getRestaurant().getId();
+
         List<Order> orders;
         if (statuses != null && !statuses.isEmpty()) {
             orders = orderRepository.findByRestaurantIdAndStatusInOrderByCreatedAtDesc(restaurantId, statuses);
@@ -123,9 +150,24 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, String newStatus) {
+    public OrderResponse updateOrderStatus(Long userId, Long orderId, String newStatus) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
+        }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        Long restaurantId = user.getRestaurant().getId();
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+                
+        if (!order.getRestaurant().getId().equals(restaurantId)) {
+            throw new IllegalArgumentException("You do not have permission to update an order from outside your restaurant.");
+        }
+        
         order.setStatus(newStatus);
         order = orderRepository.save(order);
         return new OrderResponse(order);
