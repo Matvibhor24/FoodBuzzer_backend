@@ -55,7 +55,7 @@ public class RecipeService {
         }
         Long restaurantId = user.getRestaurant().getId();
 
-        Restaurant restaurant = restaurantRepository.findByIdAndIsLiveTrue(restaurantId)
+        Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
 
         // 1. Create and save Recipe
@@ -93,7 +93,7 @@ public class RecipeService {
         }
         Long restaurantId = user.getRestaurant().getId();
 
-        if (!restaurantRepository.existsByIdAndIsLiveTrue(restaurantId)) {
+        if (!restaurantRepository.existsByIdAndIsActiveTrue(restaurantId)) {
             throw new ResourceNotFoundException("Restaurant not found");
         }
 

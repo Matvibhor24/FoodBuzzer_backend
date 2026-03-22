@@ -35,6 +35,9 @@ public class Product {
     private Boolean isDeleted = false;
 
     @Column(nullable = false)
+    private Boolean isBestSeller = false;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
@@ -116,6 +119,14 @@ public class Product {
 
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public Boolean getIsBestSeller() {
+        return isBestSeller;
+    }
+
+    public void setIsBestSeller(Boolean isBestSeller) {
+        this.isBestSeller = isBestSeller;
     }
 
     public LocalDateTime getCreatedAt() {

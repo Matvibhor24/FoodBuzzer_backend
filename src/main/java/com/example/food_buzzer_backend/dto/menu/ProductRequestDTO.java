@@ -10,6 +10,7 @@ public class ProductRequestDTO {
     private String category;
     private BigDecimal price;
     private Boolean isLive = true;
+    private Boolean isBestSeller;
     
     // We will pass the IDs of the recipes this product is composed of
     private List<ProductRecipeRequestDTO> recipes;
@@ -53,6 +54,14 @@ public class ProductRequestDTO {
 
     public void setIsLive(Boolean isLive) {
         this.isLive = isLive;
+    }
+
+    public Boolean getIsBestSeller() {
+        return isBestSeller;
+    }
+
+    public void setIsBestSeller(Boolean isBestSeller) {
+        this.isBestSeller = isBestSeller;
     }
 
     public List<ProductRecipeRequestDTO> getRecipes() {

@@ -36,8 +36,6 @@ public class TeamService {
                 response.setMessage("Email already registered and active in a team");
                 return response;
             }
-            // Otherwise, reactivate the existing user account
-            user.setIsActive(true);
         } else {
             // Create a completely new user
             user = new User();
@@ -49,12 +47,13 @@ public class TeamService {
         user.setPhone(dto.getPhone());
         user.setRestaurant(owner.getRestaurant());
         user.setRole(dto.getRole());
+        user.setIsActive(AppConstants.DEFAULT_USER_ACTIVE);
 
-        if (AppConstants.ROLE_STAFF.equals(dto.getRole()))
+        if (AppConstants.ROLE_STAFF.equalsIgnoreCase(dto.getRole()))
             user.setAccessLevel(AppConstants.ACCESS_LEVEL_STAFF);
-        else if (AppConstants.ROLE_CASHIER.equals(dto.getRole()))
+        else if (AppConstants.ROLE_CASHIER.equalsIgnoreCase(dto.getRole()))
             user.setAccessLevel(AppConstants.ACCESS_LEVEL_CASHIER);
-        else if (AppConstants.ROLE_MANAGER.equals(dto.getRole()))
+        else if (AppConstants.ROLE_MANAGER.equalsIgnoreCase(dto.getRole()))
             user.setAccessLevel(AppConstants.ACCESS_LEVEL_MANAGER);
 
         userRepository.save(user);
@@ -62,7 +61,7 @@ public class TeamService {
         response.setUserId(user.getId());
         response.setUserName(user.getFullName());
         response.setRole(user.getRole());
-        response.setMessage("User Created/Reactivated");
+        response.setMessage("User Created");
 
         return response;
     }

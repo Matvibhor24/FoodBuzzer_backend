@@ -59,6 +59,7 @@ public class RestaurantService {
         restaurant.setApprovalStatus(AppConstants.APPROVAL_STATUS_PENDING);
         restaurant.setApprovalNote(AppConstants.EMPTY_STRING);
         restaurant.setIsLive(AppConstants.DEFAULT_RESTAURANT_LIVE);
+        restaurant.setIsActive(AppConstants.DEFAULT_RESTAURANT_ACTIVE);
 
         restaurantRepository.save(restaurant);
 

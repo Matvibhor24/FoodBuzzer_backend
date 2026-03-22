@@ -10,20 +10,23 @@ public final class AppConstants {
     public static final String ROLE_MANAGER = "manager";
     public static final String ROLE_ADMIN = "admin";
 
-    public static final int ACCESS_LEVEL_DEFAULT = 0;
-    public static final int ACCESS_LEVEL_STAFF = 0;
-    public static final int ACCESS_LEVEL_CASHIER = 1;
-    public static final int ACCESS_LEVEL_MANAGER = 2;
-    public static final int ACCESS_LEVEL_OWNER = 3;
-    public static final int ACCESS_LEVEL_ADMIN = 4;
+    public static final Integer ACCESS_LEVEL_DEFAULT = 0;
+    public static final Integer ACCESS_LEVEL_STAFF = 0;
+    public static final Integer ACCESS_LEVEL_CASHIER = 1;
+    public static final Integer ACCESS_LEVEL_MANAGER = 2;
+    public static final Integer ACCESS_LEVEL_OWNER = 3;
+    public static final Integer ACCESS_LEVEL_ADMIN = 4;
 
     public static final String APPROVAL_STATUS_PENDING = "pending";
     public static final String APPROVAL_STATUS_APPROVED = "approved";
     public static final String APPROVAL_STATUS_DECLINED = "declined";
 
     public static final boolean DEFAULT_USER_ACTIVE = true;
+    public static final boolean DEFAULT_RESTAURANT_ACTIVE = false;
     public static final boolean DEFAULT_RESTAURANT_LIVE = false;
     public static final boolean DEFAULT_INVENTORY_ACTIVE = true;
+    public static final boolean FALSE_VALUE = false;
+    public static final boolean TRUE_VALUE = true;
     public static final String EMPTY_STRING = "";
 
     // Inventory Material Categories

@@ -55,7 +55,7 @@ public class ProductService {
         }
         Long restaurantId = user.getRestaurant().getId();
 
-        Restaurant restaurant = restaurantRepository.findByIdAndIsLiveTrue(restaurantId)
+        Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
 
         if (productRepository.existsBySkuAndRestaurantId(requestDTO.getSku(), restaurantId)) {
@@ -70,6 +70,7 @@ public class ProductService {
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
         product.setIsLive(requestDTO.getIsLive() != null ? requestDTO.getIsLive() : true);
+        product.setIsBestSeller(requestDTO.getIsBestSeller() != null ? requestDTO.getIsBestSeller() : false);
         Product savedProduct = productRepository.save(product);
 
         // 2. Create and save ProductRecipes (Assign recipes to product)
@@ -104,7 +105,7 @@ public class ProductService {
         }
         Long restaurantId = user.getRestaurant().getId();
 
-        if (!restaurantRepository.existsByIdAndIsLiveTrue(restaurantId)) {
+        if (!restaurantRepository.existsByIdAndIsActiveTrue(restaurantId)) {
             throw new ResourceNotFoundException("Restaurant not found");
         }
 
@@ -164,6 +165,7 @@ public class ProductService {
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
         product.setIsLive(requestDTO.getIsLive() != null ? requestDTO.getIsLive() : true);
+        product.setIsBestSeller(requestDTO.getIsBestSeller() != null ? requestDTO.getIsBestSeller() : false);
         Product savedProduct = productRepository.save(product);
 
         // 2. Delete existing ProductRecipes
@@ -198,6 +200,7 @@ public class ProductService {
         responseDTO.setCategory(product.getCategory());
         responseDTO.setPrice(product.getPrice());
         responseDTO.setIsLive(product.getIsLive());
+        responseDTO.setIsBestSeller(product.getIsBestSeller());
         responseDTO.setCreatedAt(product.getCreatedAt());
         responseDTO.setUpdatedAt(product.getUpdatedAt());
 

@@ -17,6 +17,7 @@ import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.RestaurantRepository;
 import com.example.food_buzzer_backend.repository.UserRepository;
 
+
 @Service
 public class AdminService {
 
@@ -136,6 +137,7 @@ public class AdminService {
         }
 
         restaurant.setApprovalNote(request.getApprovalNotes());
+        restaurant.setIsActive(AppConstants.TRUE_VALUE);
         restaurantRepository.save(restaurant);
 
         return new AdminApprovalResponse(
