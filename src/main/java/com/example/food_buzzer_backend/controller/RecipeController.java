@@ -1,4 +1,4 @@
-package com.example.food_buzzer_backend.controller.menu;
+package com.example.food_buzzer_backend.controller;
 
 import com.example.food_buzzer_backend.dto.ApiResponse;
 import com.example.food_buzzer_backend.dto.menu.RecipeRequestDTO;
