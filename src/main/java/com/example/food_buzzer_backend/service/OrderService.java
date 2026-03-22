@@ -11,6 +11,17 @@ import com.example.food_buzzer_backend.repository.CartRepository;
 import com.example.food_buzzer_backend.repository.CustomerRepository;
 import com.example.food_buzzer_backend.repository.OrderRepository;
 import com.example.food_buzzer_backend.repository.RestaurantRepository;
+import com.example.food_buzzer_backend.repository.ProductRecipeRepository;
+import com.example.food_buzzer_backend.repository.RecipeItemRepository;
+import com.example.food_buzzer_backend.repository.InventoryMaterialRepository;
+import com.example.food_buzzer_backend.model.ProductRecipe;
+import com.example.food_buzzer_backend.model.RecipeItem;
+import com.example.food_buzzer_backend.model.InventoryMaterial;
+import com.example.food_buzzer_backend.dto.order.CartItemDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 import com.example.food_buzzer_backend.repository.UserRepository;
 import com.example.food_buzzer_backend.config.AppConstants;
 import com.example.food_buzzer_backend.exception.ResourceNotFoundException;
@@ -40,6 +51,15 @@ public class OrderService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProductRecipeRepository productRecipeRepository;
+
+    @Autowired
+    private RecipeItemRepository recipeItemRepository;
+
+    @Autowired
+    private InventoryMaterialRepository inventoryMaterialRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -168,8 +188,61 @@ public class OrderService {
             throw new IllegalArgumentException("You do not have permission to update an order from outside your restaurant.");
         }
         
+        // Inventory Deduction Logic
+        if (AppConstants.ORDER_STATUS_PENDING.equals(order.getStatus()) && AppConstants.ORDER_STATUS_ACCEPTED.equals(newStatus)) {
+            boolean deductionSuccess = applyInventoryDeductions(order);
+            if (!deductionSuccess) {
+                order.setStatus(AppConstants.ORDER_STATUS_FAILED);
+                order = orderRepository.save(order);
+                return new OrderResponse(order);
+            }
+        }
+        
         order.setStatus(newStatus);
         order = orderRepository.save(order);
         return new OrderResponse(order);
+    }
+    
+    private boolean applyInventoryDeductions(Order order) {
+        try {
+            List<CartItemDTO> cartItems = objectMapper.readValue(order.getCart().getCartItems(), new TypeReference<List<CartItemDTO>>() {});
+            Map<Long, Double> materialNeeds = new HashMap<>();
+
+            for (CartItemDTO item : cartItems) {
+                if (item.getProductId() == null) continue; // Safety check
+
+                List<ProductRecipe> productRecipes = productRecipeRepository.findByProductId(item.getProductId());
+                for (ProductRecipe pr : productRecipes) {
+                    List<RecipeItem> recipeItems = recipeItemRepository.findByRecipeId(pr.getRecipe().getId());
+                    for (RecipeItem ri : recipeItems) {
+                        Long materialId = ri.getRawMaterial().getId();
+                        // Total requested quantity * ProductRecipe quantity * RecipeItem quantity
+                        double requiredQty = item.getQuantity() * pr.getQuantity() * ri.getQuantity();
+                        materialNeeds.put(materialId, materialNeeds.getOrDefault(materialId, 0.0) + requiredQty);
+                    }
+                }
+            }
+
+            // Verify stock
+            List<InventoryMaterial> materialsToUpdate = new ArrayList<>();
+            for (Map.Entry<Long, Double> entry : materialNeeds.entrySet()) {
+                InventoryMaterial material = inventoryMaterialRepository.findById(entry.getKey()).orElse(null);
+                if (material == null) return false; // Fail fast if material no longer exists
+                
+                if (material.getCurrentStock() < entry.getValue()) {
+                    return false; // Not enough stock
+                }
+                
+                material.setCurrentStock(material.getCurrentStock() - entry.getValue());
+                materialsToUpdate.add(material);
+            }
+
+            // Save deducted materials
+            inventoryMaterialRepository.saveAll(materialsToUpdate);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
