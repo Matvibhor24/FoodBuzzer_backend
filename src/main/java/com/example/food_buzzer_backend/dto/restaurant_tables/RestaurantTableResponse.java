@@ -13,12 +13,12 @@ public class RestaurantTableResponse {
     public RestaurantTableResponse() {}
 
     public RestaurantTableResponse(Long id,
-                                 Long restaurantId,
-                                 Integer tableNo,
-                                 Integer tableSize,
-                                 Integer floor,
-                                 Boolean isOccupied,
-                                 Boolean isDelete) {
+                                Long restaurantId,
+                                Integer tableNo,
+                                Integer tableSize,
+                                Integer floor,
+                                Boolean isOccupied,
+                                Boolean isDelete) {
         this.id = id;
         this.restaurantId = restaurantId;
         this.tableNo = tableNo;

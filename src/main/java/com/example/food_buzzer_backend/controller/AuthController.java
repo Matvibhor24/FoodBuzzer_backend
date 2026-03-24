@@ -10,6 +10,8 @@ import com.example.food_buzzer_backend.dto.auth.LoginResponse;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerRequest;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerResponse;
 import com.example.food_buzzer_backend.dto.auth.UserProfileResponseDTO;
+import com.example.food_buzzer_backend.dto.auth.UpdatePasswordRequest;
+import com.example.food_buzzer_backend.dto.auth.UpdatePasswordResponse;
 import com.example.food_buzzer_backend.service.AuthService;
 
 @RestController
@@ -35,5 +37,11 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> getMe(@RequestHeader("X-User-Id") Long userId) {
         return ResponseEntity.ok(authService.getMe(userId));
+    }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<UpdatePasswordResponse> updatePassword(@RequestHeader("X-User-Id") Long userId,
+                                                                 @Valid @RequestBody UpdatePasswordRequest request) {
+        return ResponseEntity.ok(authService.updatePassword(userId, request));
     }
 }

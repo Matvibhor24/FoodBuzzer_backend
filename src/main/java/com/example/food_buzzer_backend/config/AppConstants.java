@@ -64,4 +64,7 @@ public final class AppConstants {
     public static final String ERROR_USER_NOT_FOUND = "User not found";
     public static final String ERROR_USER_NOT_OWNER = "User is not an owner";
     public static final String ERROR_INSUFFICIENT_ACCESS = "Insufficient access level";
+    
+    public static final String MSG_PASSWORD_UPDATED_SUCCESSFULLY = "Password updated successfully";
+    public static final String MSG_INCORRECT_OLD_PASSWORD = "Incorrect old password";
 }

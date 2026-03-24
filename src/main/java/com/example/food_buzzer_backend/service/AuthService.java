@@ -11,6 +11,8 @@ import com.example.food_buzzer_backend.dto.auth.LoginResponse;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerRequest;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerResponse;
 import com.example.food_buzzer_backend.dto.auth.UserProfileResponseDTO;
+import com.example.food_buzzer_backend.dto.auth.UpdatePasswordRequest;
+import com.example.food_buzzer_backend.dto.auth.UpdatePasswordResponse;
 import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.UserRepository;
 
@@ -98,5 +100,19 @@ public class AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return new UserProfileResponseDTO(user);
+    }
+
+    public UpdatePasswordResponse updatePassword(Long userId, UpdatePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(AppConstants.ERROR_USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            return new UpdatePasswordResponse(false, AppConstants.MSG_INCORRECT_OLD_PASSWORD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return new UpdatePasswordResponse(true, AppConstants.MSG_PASSWORD_UPDATED_SUCCESSFULLY);
     }
 }
