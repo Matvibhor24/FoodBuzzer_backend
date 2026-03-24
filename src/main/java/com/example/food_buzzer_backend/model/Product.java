@@ -19,8 +19,7 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String sku;
+
 
     @Column(nullable = false)
     private String category;
@@ -84,13 +83,7 @@ public class Product {
         this.name = name;
     }
 
-    public String getSku() {
-        return sku;
-    }
 
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
 
     public String getCategory() {
         return category;

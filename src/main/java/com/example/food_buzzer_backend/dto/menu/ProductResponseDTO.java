@@ -8,7 +8,7 @@ public class ProductResponseDTO {
 
     private Long id;
     private String name;
-    private String sku;
+
     private String category;
     private BigDecimal price;
     private Boolean isLive;
@@ -36,13 +36,7 @@ public class ProductResponseDTO {
         this.name = name;
     }
 
-    public String getSku() {
-        return sku;
-    }
 
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
 
     public String getCategory() {
         return category;

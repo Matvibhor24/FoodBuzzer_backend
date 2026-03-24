@@ -58,15 +58,12 @@ public class ProductService {
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
 
-        if (productRepository.existsBySkuAndRestaurantId(requestDTO.getSku(), restaurantId)) {
-            throw new IllegalArgumentException("Product with SKU '" + requestDTO.getSku() + "' already exists");
-        }
 
         // 1. Create and save Product
         Product product = new Product();
         product.setRestaurant(restaurant);
         product.setName(requestDTO.getName());
-        product.setSku(requestDTO.getSku());
+
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
         product.setIsLive(requestDTO.getIsLive());
@@ -156,13 +153,9 @@ public class ProductService {
         Product product = productRepository.findByIdAndRestaurantIdAndIsDeletedFalse(productId, restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        if (productRepository.existsBySkuAndRestaurantIdAndIdNot(requestDTO.getSku(), restaurantId, productId)) {
-            throw new IllegalArgumentException("Product with SKU '" + requestDTO.getSku() + "' already exists");
-        }
 
         // 1. Update Product fields
         product.setName(requestDTO.getName());
-        product.setSku(requestDTO.getSku());
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
         product.setIsLive(requestDTO.getIsLive());
@@ -198,7 +191,6 @@ public class ProductService {
         ProductResponseDTO responseDTO = new ProductResponseDTO();
         responseDTO.setId(product.getId());
         responseDTO.setName(product.getName());
-        responseDTO.setSku(product.getSku());
         responseDTO.setCategory(product.getCategory());
         responseDTO.setPrice(product.getPrice());
         responseDTO.setIsLive(product.getIsLive());

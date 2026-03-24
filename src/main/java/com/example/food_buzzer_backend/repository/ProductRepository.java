@@ -11,6 +11,4 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByRestaurantIdAndIsDeletedFalse(Long restaurantId);
     Optional<Product> findByIdAndRestaurantIdAndIsDeletedFalse(Long id, Long restaurantId);
-    boolean existsBySkuAndRestaurantId(String sku, Long restaurantId);
-    boolean existsBySkuAndRestaurantIdAndIdNot(String sku, Long restaurantId, Long id);
 }

@@ -10,8 +10,7 @@ public class ProductRequestDTO {
     @NotBlank(message = "Product name is required")
     private String name;
     
-    @NotBlank(message = "Product SKU is required")
-    private String sku;
+
     
     @NotBlank(message = "Product category is required")
     private String category;
@@ -34,13 +33,7 @@ public class ProductRequestDTO {
         this.name = name;
     }
 
-    public String getSku() {
-        return sku;
-    }
 
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
 
     public String getCategory() {
         return category;
