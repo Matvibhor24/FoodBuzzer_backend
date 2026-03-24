@@ -244,7 +244,7 @@ public class OrderService {
                 }
             }
 
-            System.out.println("Material Needs for Order " + order.getId() + ": " + materialNeeds);
+            // System.out.println("Material Needs for Order " + order.getId() + ": " + materialNeeds);
 
             if (materialNeeds.isEmpty()) {
                 System.out.println("No materials needed for order " + order.getId() + ", cart parsing might have yielded no recipes.");
