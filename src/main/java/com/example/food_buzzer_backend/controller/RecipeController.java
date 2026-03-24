@@ -1,5 +1,6 @@
 package com.example.food_buzzer_backend.controller;
 
+import jakarta.validation.Valid;
 import com.example.food_buzzer_backend.dto.ApiResponse;
 import com.example.food_buzzer_backend.dto.menu.RecipeRequestDTO;
 import com.example.food_buzzer_backend.dto.menu.RecipeResponseDTO;
@@ -21,7 +22,7 @@ public class RecipeController {
     @PostMapping
     public ResponseEntity<ApiResponse> createRecipe(
             @RequestHeader(name = "X-User-Id", required = true) Long userId,
-            @RequestBody RecipeRequestDTO requestDTO) {
+            @Valid @RequestBody RecipeRequestDTO requestDTO) {
         RecipeResponseDTO responseDTO = recipeService.createRecipe(userId, requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Recipe created successfully", responseDTO));
@@ -46,7 +47,7 @@ public class RecipeController {
     public ResponseEntity<ApiResponse> updateRecipe(
             @RequestHeader(name = "X-User-Id", required = true) Long userId,
             @PathVariable Long recipeId,
-            @RequestBody RecipeRequestDTO requestDTO){
+            @Valid @RequestBody RecipeRequestDTO requestDTO){
         RecipeResponseDTO responseDTO = recipeService.updateRecipe(userId, recipeId, requestDTO);
         return ResponseEntity.ok(ApiResponse.success("Recipe updated successfully", responseDTO));
     }

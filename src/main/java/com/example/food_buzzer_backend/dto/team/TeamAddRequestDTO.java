@@ -1,11 +1,18 @@
 package com.example.food_buzzer_backend.dto.team;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class TeamAddRequestDTO {
     
+    @NotBlank(message = "Full name is required")
     private String fullName;
+    @NotBlank(message = "Email is required")
     private String email;
+    @NotBlank(message = "Password is required")
     private String password;
+    @NotBlank(message = "Phone is required")
     private String phone;
+    @NotBlank(message = "Role is required")
     private String role;
 
     public String getFullName() {

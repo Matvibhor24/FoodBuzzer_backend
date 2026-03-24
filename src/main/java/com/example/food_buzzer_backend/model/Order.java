@@ -27,6 +27,8 @@ public class Order {
 
     private String status; // e.g. PENDING, PREPARING, COMPLETED, CANCELLED
 
+    private Double rating;
+
     private LocalDateTime createdAt;
 
     private String tableId; // Used for say DINE_IN
@@ -61,4 +63,6 @@ public class Order {
     public void setDiscount(Double discount) { this.discount = discount; }
     public Double getGrandTotal() { return grandTotal; }
     public void setGrandTotal(Double grandTotal) { this.grandTotal = grandTotal; }
+    public Double getRating() { return rating; }
+    public void setRating(Double rating) { this.rating = rating; }
 }

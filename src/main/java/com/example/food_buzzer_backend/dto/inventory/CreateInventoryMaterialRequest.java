@@ -1,5 +1,7 @@
 package com.example.food_buzzer_backend.dto.inventory;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -16,12 +18,25 @@ import java.math.BigDecimal;
  */
 public class CreateInventoryMaterialRequest {
 
+    @NotBlank(message = "Name is required")
     private String name;
+    
+    @NotBlank(message = "SKU is required")
     private String sku;
+    
+    @NotBlank(message = "Category is required")
     private String category;
+    
+    @NotBlank(message = "Unit is required")
     private String unit;
+    
+    @NotNull(message = "Current stock is required")
     private Double currentStock;
+    
+    @NotNull(message = "Reorder level is required")
     private Double reorderLevel;
+    
+    @NotNull(message = "Cost per unit is required")
     private BigDecimal costPerUnit;
 
     public CreateInventoryMaterialRequest() {}

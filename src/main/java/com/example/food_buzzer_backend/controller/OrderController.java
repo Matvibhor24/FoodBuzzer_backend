@@ -1,5 +1,6 @@
 package com.example.food_buzzer_backend.controller;
 
+import jakarta.validation.Valid;
 import com.example.food_buzzer_backend.dto.order.OrderRequest;
 import com.example.food_buzzer_backend.dto.order.OrderResponse;
 import com.example.food_buzzer_backend.service.OrderService;
@@ -17,9 +18,11 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<OrderResponse> createOrder(@RequestHeader("userId") Long userId, @RequestBody OrderRequest request) {
-        OrderResponse response = orderService.createOrder(userId, request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<OrderResponse> createOrder(
+        @RequestHeader("userId") Long userId, 
+        @Valid @RequestBody OrderRequest request) {
+            OrderResponse response = orderService.createOrder(userId, request);
+            return ResponseEntity.ok(response);
     }
 
     @GetMapping("/restaurant/orders")

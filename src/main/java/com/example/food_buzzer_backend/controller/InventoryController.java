@@ -5,6 +5,7 @@ import com.example.food_buzzer_backend.dto.inventory.CreateInventoryMaterialRequ
 import com.example.food_buzzer_backend.dto.inventory.InventoryMaterialResponse;
 import com.example.food_buzzer_backend.dto.inventory.UpdateInventoryStockRequest;
 import com.example.food_buzzer_backend.service.InventoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class InventoryController {
     @PostMapping("/add")
     public ResponseEntity<?> addInventoryItem(
             @RequestHeader(name = "X-User-Id", required = true) Long userId,
-            @RequestBody CreateInventoryMaterialRequest request) {
+            @Valid @RequestBody CreateInventoryMaterialRequest request) {
 
         // First, validate the user
         Long restaurantId = inventoryService.validateUser(userId);

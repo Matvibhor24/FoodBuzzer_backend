@@ -1,5 +1,6 @@
 package com.example.food_buzzer_backend.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import com.example.food_buzzer_backend.service.TeamService;
@@ -22,7 +23,7 @@ public class TeamController {
     @PostMapping("/team-add")
     public TeamCreationResponse addTeam(
             @RequestHeader("X-User-Id") Long userId,
-            @RequestBody TeamAddRequestDTO dto) {
+            @Valid @RequestBody TeamAddRequestDTO dto) {
 
         return teamService.addTeamMember(userId, dto);
     }

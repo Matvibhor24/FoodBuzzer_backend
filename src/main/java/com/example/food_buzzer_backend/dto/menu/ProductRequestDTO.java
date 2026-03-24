@@ -1,16 +1,26 @@
 package com.example.food_buzzer_backend.dto.menu;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class ProductRequestDTO {
 
+    @NotBlank(message = "Product name is required")
     private String name;
+    
+    @NotBlank(message = "Product SKU is required")
     private String sku;
+    
+    @NotBlank(message = "Product category is required")
     private String category;
+    
+    @NotNull(message = "Product price is required")
     private BigDecimal price;
     private Boolean isLive = true;
     private Boolean isBestSeller;
+    private Boolean isVeg;
     
     // We will pass the IDs of the recipes this product is composed of
     private List<ProductRecipeRequestDTO> recipes;
@@ -62,6 +72,14 @@ public class ProductRequestDTO {
 
     public void setIsBestSeller(Boolean isBestSeller) {
         this.isBestSeller = isBestSeller;
+    }
+
+     public Boolean getIsVeg() {
+        return isVeg;
+    }
+
+    public void setIsVeg(Boolean isVeg) {
+        this.isVeg = isVeg;
     }
 
     public List<ProductRecipeRequestDTO> getRecipes() {

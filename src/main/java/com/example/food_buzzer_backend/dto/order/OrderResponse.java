@@ -14,6 +14,8 @@ public class OrderResponse {
     private String tableId;
     private Integer remainingLoyaltyPoints;
     private LocalDateTime createdAt;
+    private String cartItems;
+    private Double rating;
 
     public OrderResponse() {}
 
@@ -27,7 +29,14 @@ public class OrderResponse {
         this.status = order.getStatus();
         this.tableId = order.getTableId();
         this.createdAt = order.getCreatedAt();
+        this.rating = order.getRating();
         this.remainingLoyaltyPoints = order.getCustomer().getLoyaltyPoints();
+        if (order.getCart()!=null && order.getCart().getCartItems()!=null){
+            this.cartItems = order.getCart().getCartItems();
+        }
+        else{
+            this.cartItems = null;
+        }
     }
 
     public Long getId() { return id; }
@@ -50,4 +59,12 @@ public class OrderResponse {
     public void setRemainingLoyaltyPoints(Integer remainingLoyaltyPoints) { this.remainingLoyaltyPoints = remainingLoyaltyPoints; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getCartItems(){
+        return cartItems;
+    }
+    public void setCartItems(String cartItems){
+        this.cartItems = cartItems;
+    }
+    public Double getRating() { return rating; }
+    public void setRating(Double rating) { this.rating = rating; }
 }

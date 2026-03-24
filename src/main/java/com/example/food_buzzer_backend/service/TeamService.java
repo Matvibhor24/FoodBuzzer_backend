@@ -5,16 +5,17 @@ import com.example.food_buzzer_backend.dto.team.*;
 import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 @Service
 public class TeamService {
 
     private final UserRepository userRepository;
-
-    public TeamService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+    public TeamService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public TeamCreationResponse addTeamMember(Long ownerId, TeamAddRequestDTO dto) {
@@ -43,7 +44,7 @@ public class TeamService {
         }
 
         user.setFullName(dto.getFullName());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setPhone(dto.getPhone());
         user.setRestaurant(owner.getRestaurant());
         user.setRole(dto.getRole());

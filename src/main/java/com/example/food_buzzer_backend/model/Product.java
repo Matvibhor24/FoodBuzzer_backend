@@ -38,6 +38,9 @@ public class Product {
     private Boolean isBestSeller = false;
 
     @Column(nullable = false)
+    private Boolean isVeg = true;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
@@ -127,6 +130,14 @@ public class Product {
 
     public void setIsBestSeller(Boolean isBestSeller) {
         this.isBestSeller = isBestSeller;
+    }
+
+    public Boolean getIsVeg() {
+        return isVeg;
+    }
+
+    public void setIsVeg(Boolean isVeg) {
+        this.isVeg = isVeg;
     }
 
     public LocalDateTime getCreatedAt() {

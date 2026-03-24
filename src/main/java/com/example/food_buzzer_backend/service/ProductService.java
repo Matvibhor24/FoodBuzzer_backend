@@ -69,8 +69,9 @@ public class ProductService {
         product.setSku(requestDTO.getSku());
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
-        product.setIsLive(requestDTO.getIsLive() != null ? requestDTO.getIsLive() : true);
-        product.setIsBestSeller(requestDTO.getIsBestSeller() != null ? requestDTO.getIsBestSeller() : false);
+        product.setIsLive(requestDTO.getIsLive());
+        product.setIsBestSeller(requestDTO.getIsBestSeller());
+        product.setIsVeg(requestDTO.getIsVeg());
         Product savedProduct = productRepository.save(product);
 
         // 2. Create and save ProductRecipes (Assign recipes to product)
@@ -164,8 +165,9 @@ public class ProductService {
         product.setSku(requestDTO.getSku());
         product.setCategory(requestDTO.getCategory());
         product.setPrice(requestDTO.getPrice());
-        product.setIsLive(requestDTO.getIsLive() != null ? requestDTO.getIsLive() : true);
-        product.setIsBestSeller(requestDTO.getIsBestSeller() != null ? requestDTO.getIsBestSeller() : false);
+        product.setIsLive(requestDTO.getIsLive());
+        product.setIsBestSeller(requestDTO.getIsBestSeller());
+        product.setIsVeg(requestDTO.getIsVeg());
         Product savedProduct = productRepository.save(product);
 
         // 2. Delete existing ProductRecipes
@@ -201,6 +203,7 @@ public class ProductService {
         responseDTO.setPrice(product.getPrice());
         responseDTO.setIsLive(product.getIsLive());
         responseDTO.setIsBestSeller(product.getIsBestSeller());
+        responseDTO.setIsVeg(product.getIsVeg());
         responseDTO.setCreatedAt(product.getCreatedAt());
         responseDTO.setUpdatedAt(product.getUpdatedAt());
 

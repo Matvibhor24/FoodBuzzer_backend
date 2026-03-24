@@ -4,6 +4,7 @@ import com.example.food_buzzer_backend.dto.restaurant_tables.ApiRestaurantTableR
 import com.example.food_buzzer_backend.dto.restaurant_tables.CreateRestaurantTableRequest;
 import com.example.food_buzzer_backend.dto.restaurant_tables.RestaurantTableResponse;
 import com.example.food_buzzer_backend.service.RestaurantTableService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class RestaurantTableController {
     @PostMapping("/create")
     public ResponseEntity<?> createRestaurantTable(
             @RequestHeader("userId") Long userId,
-            @RequestBody CreateRestaurantTableRequest request) {
+            @Valid @RequestBody CreateRestaurantTableRequest request) {
 
         RestaurantTableService.ValidationResult validation = restaurantTableService.validateUserForRestaurant(userId);
         if (!validation.isValid()) {

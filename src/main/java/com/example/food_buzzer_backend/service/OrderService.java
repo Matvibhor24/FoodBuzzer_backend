@@ -140,6 +140,7 @@ public class OrderService {
         order.setGrandTotal(grandTotal);
         order.setStatus(AppConstants.ORDER_STATUS_PENDING); // Initial status
         order.setTableId(request.getTableId());
+        order.setRating(request.getRating());
         order = orderRepository.save(order);
 
         return new OrderResponse(order);
@@ -162,7 +163,6 @@ public class OrderService {
         } else {
             orders = orderRepository.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
         }
-        
         return orders.stream()
                 .map(OrderResponse::new)
                 .collect(Collectors.toList());
@@ -187,15 +187,15 @@ public class OrderService {
             throw new IllegalArgumentException("You do not have permission to update an order from outside your restaurant.");
         }
         
-        // Inventory Deduction Logic
-        if (AppConstants.ORDER_STATUS_PENDING.equals(order.getStatus()) && AppConstants.ORDER_STATUS_ACCEPTED.equals(newStatus)) {
-            boolean deductionSuccess = applyInventoryDeductions(order);
-            if (!deductionSuccess) {
-                order.setStatus(AppConstants.ORDER_STATUS_FAILED);
-                order = orderRepository.save(order);
-                return new OrderResponse(order);
-            }
-        }
+        // // Inventory Deduction Logic
+        // if (AppConstants.ORDER_STATUS_PENDING.equals(order.getStatus()) && AppConstants.ORDER_STATUS_ACCEPTED.equals(newStatus)) {
+        //     boolean deductionSuccess = applyInventoryDeductions(order);
+        //     if (!deductionSuccess) {
+        //         order.setStatus(AppConstants.ORDER_STATUS_FAILED);
+        //         order = orderRepository.save(order);
+        //         return new OrderResponse(order);
+        //     }
+        // }
         
         order.setStatus(newStatus);
         order = orderRepository.save(order);
