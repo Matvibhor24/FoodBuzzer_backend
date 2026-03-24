@@ -59,6 +59,7 @@ public class AnalyticsService {
                 date,
                 (long) orders.size(),
                 totalRevenue,
+                calculateAverageRating(orders),
                 topSellingItems,
                 hourlyOrders
         );
@@ -83,7 +84,8 @@ public class AnalyticsService {
                 currentMonth.getYear(),
                 currentMonth.getMonthValue(),
                 (long) orders.size(),
-                calculateTotalRevenue(orders)
+                calculateTotalRevenue(orders),
+                calculateAverageRating(orders)
         );
     }
 
@@ -106,6 +108,24 @@ public class AnalyticsService {
         return orders.stream()
                 .map(order -> order.getGrandTotal() != null ? order.getGrandTotal() : 0.0)
                 .reduce(0.0, Double::sum);
+    }
+
+    private Double calculateAverageRating(List<Order> orders) {
+        double totalRating = 0.0;
+        int ratedOrdersCount = 0;
+
+        for (Order order : orders) {
+            if (order.getRating() != null) {
+                totalRating += order.getRating();
+                ratedOrdersCount++;
+            }
+        }
+
+        if (ratedOrdersCount == 0) {
+            return 0.0;
+        }
+
+        return totalRating / ratedOrdersCount;
     }
 
     private List<HourlyOrderCountDTO> buildHourlyOrders(List<Order> orders) {

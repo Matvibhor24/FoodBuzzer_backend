@@ -6,14 +6,16 @@ public class MonthlyAnalyticsResponse {
     private Integer month;
     private Long totalOrders;
     private Double totalRevenue;
+    private Double averageRating;
 
     public MonthlyAnalyticsResponse() {}
 
-    public MonthlyAnalyticsResponse(Integer year, Integer month, Long totalOrders, Double totalRevenue) {
+    public MonthlyAnalyticsResponse(Integer year, Integer month, Long totalOrders, Double totalRevenue, Double averageRating) {
         this.year = year;
         this.month = month;
         this.totalOrders = totalOrders;
         this.totalRevenue = totalRevenue;
+        this.averageRating = averageRating;
     }
 
     public Integer getYear() {
@@ -46,5 +48,13 @@ public class MonthlyAnalyticsResponse {
 
     public void setTotalRevenue(Double totalRevenue) {
         this.totalRevenue = totalRevenue;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 }

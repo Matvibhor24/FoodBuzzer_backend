@@ -8,6 +8,7 @@ public class DailyAnalyticsResponse {
     private LocalDate date;
     private Long totalOrders;
     private Double totalRevenue;
+    private Double averageRating;
     private List<TopSellingItemDTO> topSellingItems;
     private List<HourlyOrderCountDTO> hourlyOrders;
 
@@ -17,12 +18,14 @@ public class DailyAnalyticsResponse {
             LocalDate date,
             Long totalOrders,
             Double totalRevenue,
+            Double averageRating,
             List<TopSellingItemDTO> topSellingItems,
             List<HourlyOrderCountDTO> hourlyOrders
     ) {
         this.date = date;
         this.totalOrders = totalOrders;
         this.totalRevenue = totalRevenue;
+        this.averageRating = averageRating;
         this.topSellingItems = topSellingItems;
         this.hourlyOrders = hourlyOrders;
     }
@@ -49,6 +52,14 @@ public class DailyAnalyticsResponse {
 
     public void setTotalRevenue(Double totalRevenue) {
         this.totalRevenue = totalRevenue;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 
     public List<TopSellingItemDTO> getTopSellingItems() {
