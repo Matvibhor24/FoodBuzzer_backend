@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantRequest;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantResponse;
 import com.example.food_buzzer_backend.dto.restaurant.MyRestaurantResponse;
+import com.example.food_buzzer_backend.dto.restaurant.UpdateRestaurantRequest;
+import com.example.food_buzzer_backend.dto.restaurant.UpdateRestaurantResponse;
 import com.example.food_buzzer_backend.service.RestaurantService;
 
 @RestController
@@ -30,5 +32,12 @@ public class RestaurantController {
     public ResponseEntity<MyRestaurantResponse> getMyRestaurant(
             @RequestHeader(name = "X-User-Id", required = true) Long userId) {
         return ResponseEntity.ok(restaurantService.getMyRestaurant(userId));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UpdateRestaurantResponse> updateRestaurant(
+            @RequestHeader(name = "X-User-Id", required = true) Long userId,
+            @Valid @RequestBody UpdateRestaurantRequest request) {
+        return ResponseEntity.ok(restaurantService.updateRestaurant(request, userId));
     }
 }

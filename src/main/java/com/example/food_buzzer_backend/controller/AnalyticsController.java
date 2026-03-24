@@ -23,7 +23,7 @@ public class AnalyticsController {
 
     @GetMapping("/daily")
     public ResponseEntity<DailyAnalyticsResponse> getDailyAnalytics(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("X-User-Id") Long userId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         DailyAnalyticsResponse response = analyticsService.getDailyAnalytics(userId, date);
         return ResponseEntity.ok(response);
@@ -31,7 +31,7 @@ public class AnalyticsController {
 
     @GetMapping("/monthly/current")
     public ResponseEntity<MonthlyAnalyticsResponse> getCurrentMonthAnalytics(
-            @RequestHeader("userId") Long userId) {
+            @RequestHeader("X-User-Id") Long userId) {
         MonthlyAnalyticsResponse response = analyticsService.getCurrentMonthAnalytics(userId);
         return ResponseEntity.ok(response);
     }

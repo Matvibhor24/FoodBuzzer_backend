@@ -23,7 +23,7 @@ public class RestaurantTableController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createRestaurantTable(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestBody CreateRestaurantTableRequest request) {
 
         RestaurantTableService.ValidationResult validation = restaurantTableService.validateUserForRestaurant(userId);
@@ -44,7 +44,7 @@ public class RestaurantTableController {
 
     @GetMapping("/active")
     public ResponseEntity<?> getAllActiveTables(
-            @RequestHeader("userId") Long userId) {
+            @RequestHeader("X-User-Id") Long userId) {
 
         RestaurantTableService.ValidationResult validation = restaurantTableService.validateUserForRestaurant(userId);
         if (!validation.isValid()) {

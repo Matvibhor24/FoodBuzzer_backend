@@ -27,7 +27,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderById(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long orderId) {
         OrderResponse response = orderService.getOrderById(userId, orderId);
         return ResponseEntity.ok(response);
@@ -35,7 +35,7 @@ public class OrderController {
 
     @GetMapping("/restaurant/orders")
     public ResponseEntity<List<OrderResponse>> getOrdersByRestaurant(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("X-User-Id") Long userId,
             @RequestParam(required = false) List<String> statuses) {
         List<OrderResponse> orders = orderService.getOrdersByRestaurant(userId, statuses);
         return ResponseEntity.ok(orders);
@@ -43,7 +43,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long orderId,
             @RequestParam String status) {
         OrderResponse response = orderService.updateOrderStatus(userId, orderId, status);

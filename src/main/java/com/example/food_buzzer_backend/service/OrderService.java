@@ -209,15 +209,15 @@ public class OrderService {
             throw new IllegalArgumentException("You do not have permission to update an order from outside your restaurant.");
         }
         
-        // // Inventory Deduction Logic
-        // if (AppConstants.ORDER_STATUS_PENDING.equals(order.getStatus()) && AppConstants.ORDER_STATUS_ACCEPTED.equals(newStatus)) {
-        //     boolean deductionSuccess = applyInventoryDeductions(order);
-        //     if (!deductionSuccess) {
-        //         order.setStatus(AppConstants.ORDER_STATUS_FAILED);
-        //         order = orderRepository.save(order);
-        //         return new OrderResponse(order);
-        //     }
-        // }
+        // Inventory Deduction Logic
+        if (AppConstants.ORDER_STATUS_PENDING.equalsIgnoreCase(order.getStatus()) && AppConstants.ORDER_STATUS_ACCEPTED.equalsIgnoreCase(newStatus)) {
+            boolean deductionSuccess = applyInventoryDeductions(order);
+            if (!deductionSuccess) {
+                order.setStatus(AppConstants.ORDER_STATUS_FAILED);
+                order = orderRepository.save(order);
+                return new OrderResponse(order);
+            }
+        }
         
         order.setStatus(newStatus.toUpperCase());
         order = orderRepository.save(order);
@@ -244,13 +244,24 @@ public class OrderService {
                 }
             }
 
+            System.out.println("Material Needs for Order " + order.getId() + ": " + materialNeeds);
+
+            if (materialNeeds.isEmpty()) {
+                System.out.println("No materials needed for order " + order.getId() + ", cart parsing might have yielded no recipes.");
+                return true; // nothing to deduct
+            }
+
             // Verify stock
             List<InventoryMaterial> materialsToUpdate = new ArrayList<>();
             for (Map.Entry<Long, Double> entry : materialNeeds.entrySet()) {
                 InventoryMaterial material = inventoryMaterialRepository.findById(entry.getKey()).orElse(null);
-                if (material == null) return false; // Fail fast if material no longer exists
+                if (material == null) {
+                    System.out.println("Material ID " + entry.getKey() + " not found!");
+                    return false; // Fail fast if material no longer exists
+                }
                 
                 if (material.getCurrentStock() < entry.getValue()) {
+                    System.out.println("Not enough stock for Material ID " + entry.getKey() + ". Needed: " + entry.getValue() + ", Current: " + material.getCurrentStock());
                     return false; // Not enough stock
                 }
                 
@@ -260,6 +271,7 @@ public class OrderService {
 
             // Save deducted materials
             inventoryMaterialRepository.saveAll(materialsToUpdate);
+            System.out.println("Successfully deducted inventory for order " + order.getId());
             return true;
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,6 +6,8 @@ import com.example.food_buzzer_backend.config.AppConstants;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantRequest;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantResponse;
 import com.example.food_buzzer_backend.dto.restaurant.MyRestaurantResponse;
+import com.example.food_buzzer_backend.dto.restaurant.UpdateRestaurantRequest;
+import com.example.food_buzzer_backend.dto.restaurant.UpdateRestaurantResponse;
 import com.example.food_buzzer_backend.model.Restaurant;
 import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.RestaurantRepository;
@@ -77,5 +79,37 @@ public class RestaurantService {
             throw new RuntimeException(AppConstants.MSG_USER_NOT_ASSIGNED_TO_RESTAURANT);
         }
         return new MyRestaurantResponse(user.getRestaurant());
+    }
+
+    public UpdateRestaurantResponse updateRestaurant(UpdateRestaurantRequest request, Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            return new UpdateRestaurantResponse(null, AppConstants.ERROR_USER_NOT_FOUND);
+        }
+
+        if (user.getRole() == null || !AppConstants.ROLE_OWNER.equalsIgnoreCase(user.getRole())) {
+            return new UpdateRestaurantResponse(null, AppConstants.ERROR_USER_NOT_OWNER);
+        }
+
+        Restaurant restaurant = user.getRestaurant();
+        if (restaurant == null) {
+            return new UpdateRestaurantResponse(null, AppConstants.MSG_USER_NOT_ASSIGNED_TO_RESTAURANT);
+        }
+
+        restaurant.setName(request.getName());
+        restaurant.setEmail(request.getEmail());
+        restaurant.setAddress(request.getAddress());
+        restaurant.setCity(request.getCity());
+        restaurant.setZipcode(request.getZipcode());
+        restaurant.setPhone(request.getPhone());
+        
+        if (request.getIsLive() != null) {
+            restaurant.setIsLive(request.getIsLive());
+        }
+
+        restaurantRepository.save(restaurant);
+
+        return new UpdateRestaurantResponse(restaurant.getId(), "Restaurant details updated successfully");
     }
 }
