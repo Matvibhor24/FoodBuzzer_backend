@@ -25,6 +25,14 @@ public class OrderController {
             return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> getOrderById(
+            @RequestHeader("userId") Long userId,
+            @PathVariable Long orderId) {
+        OrderResponse response = orderService.getOrderById(userId, orderId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/restaurant/orders")
     public ResponseEntity<List<OrderResponse>> getOrdersByRestaurant(
             @RequestHeader("userId") Long userId,

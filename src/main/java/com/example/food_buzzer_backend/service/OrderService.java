@@ -169,6 +169,27 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public OrderResponse getOrderById(Long userId, Long orderId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("User is not active");
+        }
+        if (user.getRestaurant() == null) {
+            throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        Long restaurantId = user.getRestaurant().getId();
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                
+        if (!order.getRestaurant().getId().equals(restaurantId)) {
+            throw new IllegalArgumentException("You do not have permission to access an order from outside your restaurant.");
+        }
+        
+        return new OrderResponse(order);
+    }
+
     @Transactional
     public OrderResponse updateOrderStatus(Long userId, Long orderId, String newStatus) {
         User user = userRepository.findById(userId)
