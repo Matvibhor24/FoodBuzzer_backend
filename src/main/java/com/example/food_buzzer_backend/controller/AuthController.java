@@ -2,12 +2,14 @@ package com.example.food_buzzer_backend.controller;
 
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import jakarta.validation.Valid;
 import com.example.food_buzzer_backend.dto.auth.LoginRequest;
 import com.example.food_buzzer_backend.dto.auth.LoginResponse;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerRequest;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerResponse;
+import com.example.food_buzzer_backend.dto.auth.UserProfileResponseDTO;
 import com.example.food_buzzer_backend.service.AuthService;
 
 @RestController
@@ -28,5 +30,10 @@ public class AuthController {
     @PostMapping("/register-owner")
     public RegisterOwnerResponse registerOwner(@Valid @RequestBody RegisterOwnerRequest request){
         return authService.registerOwner(request);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponseDTO> getMe(@RequestHeader("X-User-Id") Long userId) {
+        return ResponseEntity.ok(authService.getMe(userId));
     }
 }

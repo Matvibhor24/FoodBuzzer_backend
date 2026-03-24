@@ -10,6 +10,7 @@ import com.example.food_buzzer_backend.dto.auth.LoginRequest;
 import com.example.food_buzzer_backend.dto.auth.LoginResponse;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerRequest;
 import com.example.food_buzzer_backend.dto.auth.RegisterOwnerResponse;
+import com.example.food_buzzer_backend.dto.auth.UserProfileResponseDTO;
 import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.UserRepository;
 
@@ -91,5 +92,11 @@ public class AuthService {
                 user.getAccessLevel(),
                 AppConstants.MSG_OWNER_REGISTERED_SUCCESSFUL
         );
+    }
+
+    public UserProfileResponseDTO getMe(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserProfileResponseDTO(user);
     }
 }

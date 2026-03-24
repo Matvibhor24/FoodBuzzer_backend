@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.example.food_buzzer_backend.config.AppConstants;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantRequest;
 import com.example.food_buzzer_backend.dto.restaurant.CreateRestaurantResponse;
+import com.example.food_buzzer_backend.dto.restaurant.MyRestaurantResponse;
 import com.example.food_buzzer_backend.model.Restaurant;
 import com.example.food_buzzer_backend.model.User;
 import com.example.food_buzzer_backend.repository.RestaurantRepository;
@@ -67,5 +68,14 @@ public class RestaurantService {
         userRepository.save(owner);
 
         return new CreateRestaurantResponse(restaurant.getId(), AppConstants.MSG_RESTAURANT_SUBMITTED_FOR_APPROVAL);
+    }
+
+    public MyRestaurantResponse getMyRestaurant(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getRestaurant() == null) {
+            throw new RuntimeException(AppConstants.MSG_USER_NOT_ASSIGNED_TO_RESTAURANT);
+        }
+        return new MyRestaurantResponse(user.getRestaurant());
     }
 }
