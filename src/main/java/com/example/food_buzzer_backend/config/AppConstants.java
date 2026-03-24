@@ -17,9 +17,9 @@ public final class AppConstants {
     public static final Integer ACCESS_LEVEL_OWNER = 3;
     public static final Integer ACCESS_LEVEL_ADMIN = 4;
 
-    public static final String APPROVAL_STATUS_PENDING = "pending";
-    public static final String APPROVAL_STATUS_APPROVED = "approved";
-    public static final String APPROVAL_STATUS_DECLINED = "declined";
+    public static final String APPROVAL_STATUS_PENDING = "PENDING";
+    public static final String APPROVAL_STATUS_APPROVED = "APPROVED";
+    public static final String APPROVAL_STATUS_DECLINED = "DECLINED";
 
     public static final boolean DEFAULT_USER_ACTIVE = true;
     public static final boolean DEFAULT_RESTAURANT_ACTIVE = false;

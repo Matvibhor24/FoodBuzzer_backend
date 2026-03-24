@@ -69,9 +69,9 @@ public class AdminService {
 
         if (status == null || status.equalsIgnoreCase("all")) {
             restaurants = restaurantRepository.findAll();
-            normalizedStatus = "all";
+            normalizedStatus = "ALL";
         } else {
-            normalizedStatus = status.toLowerCase();
+            normalizedStatus = status.toUpperCase();
             restaurants = restaurantRepository.findByApprovalStatus(normalizedStatus);
         }
 
@@ -85,7 +85,7 @@ public class AdminService {
         long declinedCount = restaurantRepository.countByApprovalStatus(AppConstants.APPROVAL_STATUS_DECLINED);
 
         return new AdminDashboardResponse(
-                normalizedStatus.toUpperCase(),
+                normalizedStatus,
                 responses,
                 responses.size(),
                 pendingCount,

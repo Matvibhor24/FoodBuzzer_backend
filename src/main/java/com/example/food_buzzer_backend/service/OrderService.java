@@ -159,7 +159,8 @@ public class OrderService {
 
         List<Order> orders;
         if (statuses != null && !statuses.isEmpty()) {
-            orders = orderRepository.findByRestaurantIdAndStatusInOrderByCreatedAtDesc(restaurantId, statuses);
+            List<String> upperStatuses = statuses.stream().map(String::toUpperCase).collect(Collectors.toList());
+            orders = orderRepository.findByRestaurantIdAndStatusInOrderByCreatedAtDesc(restaurantId, upperStatuses);
         } else {
             orders = orderRepository.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
         }
@@ -197,7 +198,7 @@ public class OrderService {
         //     }
         // }
         
-        order.setStatus(newStatus);
+        order.setStatus(newStatus.toUpperCase());
         order = orderRepository.save(order);
         return new OrderResponse(order);
     }
