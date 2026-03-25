@@ -119,6 +119,11 @@ public class OrderService {
         customer.setLoyaltyPoints(customer.getLoyaltyPoints() + 5);
         customerRepository.save(customer);
 
+        // Optional early inventory check: fail order creation if stock is insufficient
+        if (!checkInventoryAvailability(request.getCartItems())) {
+            throw new RuntimeException("Insufficient inventory to fulfill this order");
+        }
+
         double grandTotal = cartTotal - discount;
         if (grandTotal < 0) grandTotal = 0.0;
 
@@ -147,6 +152,34 @@ public class OrderService {
         order = orderRepository.save(order);
 
         return new OrderResponse(order);
+    }
+
+    private boolean checkInventoryAvailability(List<CartItemDTO> cartItems) {
+        if (cartItems == null || cartItems.isEmpty()) return true;
+
+        Map<Long, Double> materialNeeds = new HashMap<>();
+
+        for (CartItemDTO item : cartItems) {
+            if (item.getProductId() == null) continue;
+
+            List<ProductRecipe> productRecipes = productRecipeRepository.findByProductId(item.getProductId());
+            for (ProductRecipe pr : productRecipes) {
+                List<RecipeItem> recipeItems = recipeItemRepository.findByRecipeId(pr.getRecipe().getId());
+                for (RecipeItem ri : recipeItems) {
+                    Long materialId = ri.getRawMaterial().getId();
+                    double requiredQty = item.getQuantity() * pr.getQuantity() * ri.getQuantity();
+                    materialNeeds.put(materialId, materialNeeds.getOrDefault(materialId, 0.0) + requiredQty);
+                }
+            }
+        }
+
+        for (Map.Entry<Long, Double> entry : materialNeeds.entrySet()) {
+            InventoryMaterial material = inventoryMaterialRepository.findById(entry.getKey()).orElse(null);
+            if (material == null || material.getCurrentStock() < entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<OrderResponse> getOrdersByRestaurant(Long userId, List<String> statuses) {
@@ -263,8 +296,7 @@ public class OrderService {
                 return true; // nothing to deduct
             }
 
-            // Verify stock
-            List<InventoryMaterial> materialsToUpdate = new ArrayList<>();
+            // First pass: Verify stock for all materials without mutating entities
             for (Map.Entry<Long, Double> entry : materialNeeds.entrySet()) {
                 InventoryMaterial material = inventoryMaterialRepository.findById(entry.getKey()).orElse(null);
                 if (material == null) {
@@ -276,9 +308,16 @@ public class OrderService {
                     System.out.println("Not enough stock for Material ID " + entry.getKey() + ". Needed: " + entry.getValue() + ", Current: " + material.getCurrentStock());
                     return false; // Not enough stock
                 }
-                
-                material.setCurrentStock(material.getCurrentStock() - entry.getValue());
-                materialsToUpdate.add(material);
+            }
+
+            // Second pass: All checks passed, now deduct and save
+            List<InventoryMaterial> materialsToUpdate = new ArrayList<>();
+            for (Map.Entry<Long, Double> entry : materialNeeds.entrySet()) {
+                InventoryMaterial material = inventoryMaterialRepository.findById(entry.getKey()).orElse(null);
+                if (material != null) {
+                    material.setCurrentStock(material.getCurrentStock() - entry.getValue());
+                    materialsToUpdate.add(material);
+                }
             }
 
             // Save deducted materials

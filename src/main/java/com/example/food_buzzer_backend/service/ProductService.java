@@ -2,6 +2,7 @@ package com.example.food_buzzer_backend.service;
 
 import com.example.food_buzzer_backend.dto.menu.ProductRequestDTO;
 import com.example.food_buzzer_backend.dto.menu.ProductResponseDTO;
+import com.example.food_buzzer_backend.dto.menu.PublicProductResponseDTO;
 import com.example.food_buzzer_backend.exception.ResourceNotFoundException;
 import com.example.food_buzzer_backend.model.Product;
 import com.example.food_buzzer_backend.model.ProductRecipe;
@@ -196,6 +197,26 @@ public class ProductService {
         }
 
         return mapToResponseDTO(savedProduct, recipes);
+    }
+
+    public List<PublicProductResponseDTO> getPublicMenuByRestaurantSlug(String slug) {
+        Restaurant restaurant = restaurantRepository.findBySlugAndIsActiveTrueAndIsLiveTrue(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found or not active"));
+
+        List<Product> products = productRepository.findByRestaurantIdAndIsDeletedFalseAndIsLiveTrue(restaurant.getId());
+
+        return products.stream().map(this::mapToPublicResponseDTO).collect(Collectors.toList());
+    }
+
+    private PublicProductResponseDTO mapToPublicResponseDTO(Product product) {
+        PublicProductResponseDTO dto = new PublicProductResponseDTO();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setCategory(product.getCategory());
+        dto.setPrice(product.getPrice());
+        dto.setIsBestSeller(product.getIsBestSeller());
+        dto.setIsVeg(product.getIsVeg());
+        return dto;
     }
 
     // Helper mapping method

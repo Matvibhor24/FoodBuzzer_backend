@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByRestaurantIdAndIsDeletedFalse(Long restaurantId);
     Optional<Product> findByIdAndRestaurantIdAndIsDeletedFalse(Long id, Long restaurantId);
+
+    List<Product> findByRestaurantIdAndIsDeletedFalseAndIsLiveTrue(Long restaurantId);
 }

@@ -26,5 +26,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     
     boolean existsByIdAndIsActiveTrue(Long id);
 
+    Optional<Restaurant> findBySlugAndIsActiveTrueAndIsLiveTrue(String slug);
+
     
 }
