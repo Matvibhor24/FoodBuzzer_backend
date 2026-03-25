@@ -13,6 +13,9 @@ public class RegisterOwnerRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
+    @NotBlank(message = "Phone is required")
+    private String phone;
+
     public RegisterOwnerRequest(){}
 
     public String getFullName() {
@@ -37,5 +40,13 @@ public class RegisterOwnerRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

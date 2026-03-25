@@ -72,6 +72,9 @@ public class OrderService {
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
         }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
+        }
         Long restaurantId = user.getRestaurant().getId();
 
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
@@ -155,6 +158,9 @@ public class OrderService {
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
         }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
+        }
         Long restaurantId = user.getRestaurant().getId();
 
         List<Order> orders;
@@ -178,6 +184,9 @@ public class OrderService {
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
         }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
+        }
         Long restaurantId = user.getRestaurant().getId();
 
         Order order = orderRepository.findById(orderId)
@@ -199,6 +208,9 @@ public class OrderService {
         }
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
         }
         Long restaurantId = user.getRestaurant().getId();
 

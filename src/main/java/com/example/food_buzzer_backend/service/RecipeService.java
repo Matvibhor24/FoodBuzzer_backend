@@ -50,6 +50,9 @@ public class RecipeService {
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
         }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
+        }
         if (user.getAccessLevel() < AppConstants.ACCESS_LEVEL_MANAGER) {
             throw new IllegalArgumentException("User does not have permission to create recipes");
         }
@@ -91,6 +94,9 @@ public class RecipeService {
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
         }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
+        }
         Long restaurantId = user.getRestaurant().getId();
 
         if (!restaurantRepository.existsByIdAndIsActiveTrue(restaurantId)) {
@@ -115,6 +121,9 @@ public class RecipeService {
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
         }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
+        }
         Long restaurantId = user.getRestaurant().getId();
 
         Recipe recipe = recipeRepository.findByIdAndRestaurantIdAndIsDeletedFalse(recipeId, restaurantId)
@@ -134,6 +143,9 @@ public class RecipeService {
         }
         if (user.getRestaurant() == null) {
             throw new IllegalArgumentException("User does not belong to any restaurant");
+        }
+        if (!user.getRestaurant().getIsActive()) {
+            throw new IllegalArgumentException("Restaurant is not active");
         }
         if (user.getAccessLevel() < AppConstants.ACCESS_LEVEL_MANAGER) {
             throw new IllegalArgumentException("User does not have permission to update recipes");

@@ -80,6 +80,12 @@ public class InventoryService {
             return null;
         }
         
+        // Check if restaurant is active
+        if (!user.getRestaurant().getIsActive()) {
+            logger.warn("User {}'s restaurant is not active", userId);
+            return null;
+        }
+        
         logger.info("User {} validated successfully. Restaurant ID: {}", userId, user.getRestaurant().getId());
         return user.getRestaurant().getId();
     }
