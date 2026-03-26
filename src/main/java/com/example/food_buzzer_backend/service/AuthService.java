@@ -81,7 +81,6 @@ public class AuthService {
         user.setEmail(request.getEmail());
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setPhone(request.getPhone());
 
         user.setRole(AppConstants.ROLE_OWNER);
         user.setAccessLevel(AppConstants.ACCESS_LEVEL_OWNER);
