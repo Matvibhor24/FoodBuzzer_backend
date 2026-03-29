@@ -8,4 +8,6 @@ import java.util.List;
 public interface RestaurantTableRepository extends JpaRepository<RestaurantTable, Long> {
 
     List<RestaurantTable> findByRestaurantIdAndIsDeleteFalse(Long restaurantId);
+
+    boolean existsByRestaurantIdAndTableNoAndFloorAndIsDeleteFalse(Long restaurantId, Integer tableNo, Integer floor);
 }

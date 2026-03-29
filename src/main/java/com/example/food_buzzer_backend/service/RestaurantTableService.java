@@ -59,6 +59,10 @@ public class RestaurantTableService {
             return null;
         }
 
+        if (restaurantTableRepository.existsByRestaurantIdAndTableNoAndFloorAndIsDeleteFalse(restaurantId, request.getTableNo(), request.getFloor())) {
+            throw new IllegalStateException("Table number " + request.getTableNo() + " on floor " + request.getFloor() + " already exists for this restaurant");
+        }
+
         RestaurantTable table = new RestaurantTable();
         table.setRestaurant(restaurant);
         table.setTableNo(request.getTableNo());
