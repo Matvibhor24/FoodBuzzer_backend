@@ -104,7 +104,7 @@ public class InventoryMaterialResponse {
 
     // Getter and Setter for currentStock
     public Double getCurrentStock() {
-        return currentStock;
+        return currentStock != null ? Math.round(currentStock * 100.0) / 100.0 : null;
     }
 
     public void setCurrentStock(Double currentStock) {
