@@ -32,7 +32,14 @@ public class RestaurantTableController {
                     .body(new ApiRestaurantTableResponse(false, validation.getMessage()));
         }
 
-        RestaurantTableResponse created = restaurantTableService.createTable(validation.getRestaurantId(), request);
+        RestaurantTableResponse created;
+        try {
+            created = restaurantTableService.createTable(validation.getRestaurantId(), request);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiRestaurantTableResponse(false, e.getMessage()));
+        }
+
         if (created == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiRestaurantTableResponse(false, "user is not active or restraunt not exist"));
