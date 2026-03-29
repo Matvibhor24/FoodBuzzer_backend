@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import com.example.food_buzzer_backend.dto.ApiResponse;
 import com.example.food_buzzer_backend.dto.menu.ProductRequestDTO;
 import com.example.food_buzzer_backend.dto.menu.ProductResponseDTO;
-import com.example.food_buzzer_backend.dto.menu.PublicProductResponseDTO;
+import com.example.food_buzzer_backend.dto.menu.PublicMenuResponseDTO;
 import com.example.food_buzzer_backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,7 +55,7 @@ public class ProductController {
 
     @GetMapping("/public/restaurants/{slug}/menu")
     public ResponseEntity<ApiResponse> getPublicMenuByRestaurantSlug(@PathVariable String slug) {
-        List<PublicProductResponseDTO> products = productService.getPublicMenuByRestaurantSlug(slug);
-        return ResponseEntity.ok(ApiResponse.success("Menu retrieved successfully", products));
+        PublicMenuResponseDTO menu = productService.getPublicMenuByRestaurantSlug(slug);
+        return ResponseEntity.ok(ApiResponse.success("Menu retrieved successfully", menu));
     }
 }

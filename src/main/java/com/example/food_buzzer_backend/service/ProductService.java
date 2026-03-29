@@ -2,6 +2,7 @@ package com.example.food_buzzer_backend.service;
 
 import com.example.food_buzzer_backend.dto.menu.ProductRequestDTO;
 import com.example.food_buzzer_backend.dto.menu.ProductResponseDTO;
+import com.example.food_buzzer_backend.dto.menu.PublicMenuResponseDTO;
 import com.example.food_buzzer_backend.dto.menu.PublicProductResponseDTO;
 import com.example.food_buzzer_backend.exception.ResourceNotFoundException;
 import com.example.food_buzzer_backend.model.Product;
@@ -199,13 +200,30 @@ public class ProductService {
         return mapToResponseDTO(savedProduct, recipes);
     }
 
-    public List<PublicProductResponseDTO> getPublicMenuByRestaurantSlug(String slug) {
+    public PublicMenuResponseDTO getPublicMenuByRestaurantSlug(String slug) {
         Restaurant restaurant = restaurantRepository.findBySlugAndIsActiveTrueAndIsLiveTrue(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found or not active"));
 
-        List<Product> products = productRepository.findByRestaurantIdAndIsDeletedFalseAndIsLiveTrue(restaurant.getId());
+        // Map restaurant basic info
+        PublicMenuResponseDTO.RestaurantInfoDTO restaurantInfo = new PublicMenuResponseDTO.RestaurantInfoDTO();
+        restaurantInfo.setId(restaurant.getId());
+        restaurantInfo.setName(restaurant.getName());
+        restaurantInfo.setSlug(restaurant.getSlug());
+        restaurantInfo.setAddress(restaurant.getAddress());
+        restaurantInfo.setCity(restaurant.getCity());
+        restaurantInfo.setPhone(restaurant.getPhone());
+        restaurantInfo.setEmail(restaurant.getEmail());
 
-        return products.stream().map(this::mapToPublicResponseDTO).collect(Collectors.toList());
+        // Fetch live products
+        List<Product> products = productRepository.findByRestaurantIdAndIsDeletedFalseAndIsLiveTrue(restaurant.getId());
+        List<PublicProductResponseDTO> productDTOs = products.stream()
+                .map(this::mapToPublicResponseDTO)
+                .collect(Collectors.toList());
+
+        PublicMenuResponseDTO response = new PublicMenuResponseDTO();
+        response.setRestaurant(restaurantInfo);
+        response.setProducts(productDTOs);
+        return response;
     }
 
     private PublicProductResponseDTO mapToPublicResponseDTO(Product product) {
