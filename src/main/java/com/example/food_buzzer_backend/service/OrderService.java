@@ -92,9 +92,12 @@ public class OrderService {
                     return customerRepository.save(newCustomer);
                 });
 
-        // Update name/email if necessary, but skipping for brevity
+        // Update name/email if necessary
         if (request.getCustomerName() != null && !request.getCustomerName().isEmpty() && !request.getCustomerName().equals(customer.getName())) {
              customer.setName(request.getCustomerName());
+        }
+        if (request.getCustomerEmail() != null && !request.getCustomerEmail().isEmpty() && !request.getCustomerEmail().equals(customer.getEmailId())) {
+            customer.setEmailId(request.getCustomerEmail());
         }
 
         double cartTotal = 0.0;
