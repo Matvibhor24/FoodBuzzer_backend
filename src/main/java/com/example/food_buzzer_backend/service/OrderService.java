@@ -64,21 +64,33 @@ public class OrderService {
 
     @Transactional
     public OrderResponse createOrder(Long userId, OrderRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (!user.getIsActive()) {
-            throw new IllegalArgumentException("User is not active");
-        }
-        if (user.getRestaurant() == null) {
-            throw new IllegalArgumentException("User does not belong to any restaurant");
-        }
-        if (!user.getRestaurant().getIsActive()) {
-            throw new IllegalArgumentException("Restaurant is not active");
-        }
-        Long restaurantId = user.getRestaurant().getId();
+        Restaurant restaurant;
 
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        if (userId != null) {
+            // ── STAFF / CASHIER FLOW ──────────────────────────────────────────
+            // Restaurant is derived from the logged-in staff member's account.
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            if (!user.getIsActive()) {
+                throw new IllegalArgumentException("User is not active");
+            }
+            if (user.getRestaurant() == null) {
+                throw new IllegalArgumentException("User does not belong to any restaurant");
+            }
+            if (!user.getRestaurant().getIsActive()) {
+                throw new IllegalArgumentException("Restaurant is not active");
+            }
+            restaurant = restaurantRepository.findById(user.getRestaurant().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
+        } else {
+            // ── CUSTOMER SELF-ORDER FLOW ──────────────────────────────────────
+            // No user login; restaurant is resolved from the slug sent in the request body.
+            if (request.getRestaurantSlug() == null || request.getRestaurantSlug().isBlank()) {
+                throw new IllegalArgumentException("restaurantSlug is required when ordering without a staff login");
+            }
+            restaurant = restaurantRepository.findBySlugAndIsActiveTrueAndIsLiveTrue(request.getRestaurantSlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found or is not currently accepting orders"));
+        }
 
         // Find or create customer based on phone and restaurant
         Customer customer = customerRepository.findByPhoneAndRestaurantId(request.getCustomerPhone(), restaurant.getId())
@@ -92,7 +104,7 @@ public class OrderService {
                     return customerRepository.save(newCustomer);
                 });
 
-        // Update name/email if necessary
+        // Update name/email if provided and different
         if (request.getCustomerName() != null && !request.getCustomerName().isEmpty() && !request.getCustomerName().equals(customer.getName())) {
              customer.setName(request.getCustomerName());
         }
@@ -104,17 +116,15 @@ public class OrderService {
         if (request.getCartItems() != null) {
             for (CartItemDTO item : request.getCartItems()) {
                 cartTotal += (item.getUnitPrice() * item.getQuantity());
-                // ensure front-end total price matches or just use backend calculation
                 item.setTotalPrice(item.getUnitPrice() * item.getQuantity());
             }
         }
 
         double discount = 0.0;
-        
+
         // Loyalty logic: if cartTotal > 500, apply points as discount
         if (cartTotal > 500 && customer.getLoyaltyPoints() > 0) {
             discount = Math.min((double) customer.getLoyaltyPoints(), cartTotal);
-            // Deduct points
             customer.setLoyaltyPoints(customer.getLoyaltyPoints() - (int) discount);
         }
 
@@ -122,7 +132,7 @@ public class OrderService {
         customer.setLoyaltyPoints(customer.getLoyaltyPoints() + 5);
         customerRepository.save(customer);
 
-        // Optional early inventory check: fail order creation if stock is insufficient
+        // Optional early inventory check
         if (!checkInventoryAvailability(request.getCartItems())) {
             throw new RuntimeException("Insufficient inventory to fulfill this order");
         }
@@ -149,8 +159,8 @@ public class OrderService {
         order.setCartTotal(cartTotal);
         order.setDiscount(discount);
         order.setGrandTotal(grandTotal);
-        order.setStatus(AppConstants.ORDER_STATUS_PENDING); // Initial status
-        order.setTableId(request.getTableId());
+        order.setStatus(AppConstants.ORDER_STATUS_PENDING);
+        order.setTableId(request.getTableId()); // null is fine — optional for both flows
         order.setRating(request.getRating());
         order = orderRepository.save(order);
 

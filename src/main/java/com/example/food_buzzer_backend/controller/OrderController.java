@@ -19,7 +19,7 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<OrderResponse> createOrder(
-        @RequestHeader("X-User-Id") Long userId, 
+        @RequestHeader(name = "X-User-Id", required = false) Long userId,
         @Valid @RequestBody OrderRequest request) {
             OrderResponse response = orderService.createOrder(userId, request);
             return ResponseEntity.ok(response);
