@@ -24,7 +24,7 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> getCustomers(
-            @RequestHeader("userId") Long userId,
+            @RequestHeader("X-User-Id") Long userId,
             @RequestParam(required = false) Long id) {
         try {
             if (id == null) {

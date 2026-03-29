@@ -47,6 +47,11 @@ public class RestaurantTableService {
         return ValidationResult.ok(user.getRestaurant().getId());
     }
 
+    public Long getRestaurantIdBySlug(String slug) {
+        Restaurant restaurant = restaurantRepository.findBySlugAndIsActiveTrueAndIsLiveTrue(slug).orElse(null);
+        return restaurant != null ? restaurant.getId() : null;
+    }
+
     public RestaurantTableResponse createTable(Long restaurantId, CreateRestaurantTableRequest request) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElse(null);
         if (restaurant == null) {

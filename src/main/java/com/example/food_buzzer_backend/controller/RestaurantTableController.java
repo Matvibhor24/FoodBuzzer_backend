@@ -44,15 +44,30 @@ public class RestaurantTableController {
 
     @GetMapping("/active")
     public ResponseEntity<?> getAllActiveTables(
-            @RequestHeader("X-User-Id") Long userId) {
+            @RequestHeader(value = "X-User-Id", required = false) Long userId,
+            @RequestParam(value = "restaurantSlug", required = false) String restaurantSlug) {
 
-        RestaurantTableService.ValidationResult validation = restaurantTableService.validateUserForRestaurant(userId);
-        if (!validation.isValid()) {
+        Long restaurantId = null;
+
+        if (userId != null) {
+            RestaurantTableService.ValidationResult validation = restaurantTableService.validateUserForRestaurant(userId);
+            if (!validation.isValid()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ApiRestaurantTableResponse(false, validation.getMessage()));
+            }
+            restaurantId = validation.getRestaurantId();
+        } else if (restaurantSlug != null) {
+            restaurantId = restaurantTableService.getRestaurantIdBySlug(restaurantSlug);
+            if (restaurantId == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ApiRestaurantTableResponse(false, "Invalid restaurant slug or restaurant is not active"));
+            }
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiRestaurantTableResponse(false, validation.getMessage()));
+                    .body(new ApiRestaurantTableResponse(false, "Either X-User-Id header or restaurantSlug parameter is required"));
         }
 
-        List<RestaurantTableResponse> tables = restaurantTableService.getAllActiveTables(validation.getRestaurantId());
+        List<RestaurantTableResponse> tables = restaurantTableService.getAllActiveTables(restaurantId);
         return ResponseEntity.ok(new ApiRestaurantTableResponse(true, "active tables fetched successfully", tables));
     }
 }
