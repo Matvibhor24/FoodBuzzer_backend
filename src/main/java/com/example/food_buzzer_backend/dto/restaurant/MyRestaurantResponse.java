@@ -13,6 +13,7 @@ public class MyRestaurantResponse {
     private String phone;
     private String approvalStatus;
     private String approvalNote;
+    private String email;
     private boolean isLive;
     private boolean isActive;
     private LocalDateTime createdAt;
@@ -29,6 +30,7 @@ public class MyRestaurantResponse {
         this.phone = restaurant.getPhone();
         this.approvalStatus = restaurant.getApprovalStatus();
         this.approvalNote = restaurant.getApprovalNote();
+        this.email = restaurant.getEmail();
         this.isLive = restaurant.getIsLive();
         this.isActive = restaurant.getIsActive();
         this.createdAt = restaurant.getCreatedAt();
@@ -52,6 +54,8 @@ public class MyRestaurantResponse {
     public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
     public String getApprovalNote() { return approvalNote; }
     public void setApprovalNote(String approvalNote) { this.approvalNote = approvalNote; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     public boolean getIsLive() { return isLive; }
     public void setIsLive(boolean isLive) { this.isLive = isLive; }
     public boolean getIsActive() { return isActive; }
