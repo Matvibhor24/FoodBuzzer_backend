@@ -58,6 +58,7 @@ public class RestaurantService {
         restaurant.setGST(request.getGST());
         restaurant.setZipcode(request.getZipcode());
         restaurant.setPhone(request.getPhone());
+        restaurant.setEmail(owner.getEmail());
         restaurant.setOwner(owner);
         restaurant.setApprovalStatus(AppConstants.APPROVAL_STATUS_PENDING);
         restaurant.setApprovalNote(AppConstants.EMPTY_STRING);
@@ -66,6 +67,7 @@ public class RestaurantService {
 
         restaurantRepository.save(restaurant);
 
+        owner.setPhone(request.getPhone());
         owner.setRestaurant(restaurant);
         userRepository.save(owner);
 
