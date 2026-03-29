@@ -52,10 +52,10 @@ public class MyRestaurantResponse {
     public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
     public String getApprovalNote() { return approvalNote; }
     public void setApprovalNote(String approvalNote) { this.approvalNote = approvalNote; }
-    public boolean isLive() { return isLive; }
-    public void setLive(boolean live) { isLive = live; }
-    public boolean isActive() { return isActive; }
-    public void setActive(boolean active) { isActive = active; }
+    public boolean getIsLive() { return isLive; }
+    public void setIsLive(boolean isLive) { this.isLive = isLive; }
+    public boolean getIsActive() { return isActive; }
+    public void setIsActive(boolean isActive) { this.isActive = isActive; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
