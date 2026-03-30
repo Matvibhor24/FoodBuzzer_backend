@@ -132,12 +132,13 @@ public class AdminService {
 
         if (Boolean.TRUE.equals(request.getIsApproved())) {
             restaurant.setApprovalStatus(AppConstants.APPROVAL_STATUS_APPROVED);
+            restaurant.setIsActive(AppConstants.TRUE_VALUE);
         } else {
             restaurant.setApprovalStatus(AppConstants.APPROVAL_STATUS_DECLINED);
+            restaurant.setIsActive(AppConstants.FALSE_VALUE);
         }
 
         restaurant.setApprovalNote(request.getApprovalNotes());
-        restaurant.setIsActive(AppConstants.TRUE_VALUE);
         restaurantRepository.save(restaurant);
 
         return new AdminApprovalResponse(

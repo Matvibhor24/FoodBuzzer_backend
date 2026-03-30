@@ -17,6 +17,8 @@ import com.example.food_buzzer_backend.repository.InventoryMaterialRepository;
 import com.example.food_buzzer_backend.model.ProductRecipe;
 import com.example.food_buzzer_backend.model.RecipeItem;
 import com.example.food_buzzer_backend.model.InventoryMaterial;
+import com.example.food_buzzer_backend.model.RestaurantTable;
+import com.example.food_buzzer_backend.repository.RestaurantTableRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
 import java.util.HashMap;
@@ -59,6 +61,9 @@ public class OrderService {
 
     @Autowired
     private InventoryMaterialRepository inventoryMaterialRepository;
+
+    @Autowired
+    private RestaurantTableRepository restaurantTableRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -151,7 +156,6 @@ public class OrderService {
         }
         cart = cartRepository.save(cart);
 
-        // Save Order
         Order order = new Order();
         order.setCart(cart);
         order.setCustomer(customer);
@@ -163,6 +167,24 @@ public class OrderService {
         order.setTableId(request.getTableId()); // null is fine — optional for both flows
         order.setRating(request.getRating());
         order = orderRepository.save(order);
+
+        // Update table status to occupied if a tableId is provided
+        if (request.getTableId() != null && !request.getTableId().trim().isEmpty()) {
+            try {
+                Long tableIdParsed = Long.parseLong(request.getTableId().trim());
+                RestaurantTable table = restaurantTableRepository.findById(tableIdParsed).orElse(null);
+                
+                if (table != null && table.getRestaurant().getId().equals(restaurant.getId())) {
+                    if (table.getIsOccupied()) {
+                        throw new RuntimeException("Table " + tableIdParsed + " is already occupied!");
+                    }
+                    table.setIsOccupied(true);
+                    restaurantTableRepository.save(table);
+                }
+            } catch (NumberFormatException e) {
+                // Ignore parsing errors for table ID
+            }
+        }
 
         return new OrderResponse(order);
     }
@@ -273,13 +295,36 @@ public class OrderService {
             if (!deductionSuccess) {
                 order.setStatus(AppConstants.ORDER_STATUS_FAILED);
                 order = orderRepository.save(order);
+                freeTableIfOccupied(order.getTableId(), restaurantId);
                 return new OrderResponse(order);
             }
         }
         
         order.setStatus(newStatus.toUpperCase());
         order = orderRepository.save(order);
+
+        // Free the table if the order is completed, cancelled, or failed
+        if ("COMPLETED".equalsIgnoreCase(newStatus) || "CANCELLED".equalsIgnoreCase(newStatus) || "FAILED".equalsIgnoreCase(newStatus)) {
+            freeTableIfOccupied(order.getTableId(), restaurantId);
+        }
+
         return new OrderResponse(order);
+    }
+    
+    private void freeTableIfOccupied(String tableIdStr, Long restaurantId) {
+        if (tableIdStr != null && !tableIdStr.trim().isEmpty()) {
+            try {
+                Long tableIdParsed = Long.parseLong(tableIdStr.trim());
+                restaurantTableRepository.findById(tableIdParsed).ifPresent(table -> {
+                    if (table.getRestaurant().getId().equals(restaurantId)) {
+                        table.setIsOccupied(false);
+                        restaurantTableRepository.save(table);
+                    }
+                });
+            } catch (NumberFormatException e) {
+                // Ignore parsing errors for table ID
+            }
+        }
     }
     
     private boolean applyInventoryDeductions(Order order) {

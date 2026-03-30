@@ -9,5 +9,9 @@ public interface RestaurantTableRepository extends JpaRepository<RestaurantTable
 
     List<RestaurantTable> findByRestaurantIdAndIsDeleteFalse(Long restaurantId);
 
+    List<RestaurantTable> findByRestaurantIdAndIsDeleteFalseAndIsOccupiedFalse(Long restaurantId);
+
+    java.util.Optional<RestaurantTable> findFirstByRestaurantIdAndTableNoAndIsDeleteFalse(Long restaurantId, Integer tableNo);
+
     boolean existsByRestaurantIdAndTableNoAndFloorAndIsDeleteFalse(Long restaurantId, Integer tableNo, Integer floor);
 }
